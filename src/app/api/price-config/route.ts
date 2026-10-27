@@ -8,10 +8,10 @@ export async function GET() {
       orderBy: { key: "asc" },
     });
     return NextResponse.json({ configs });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Fetch price config error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch price config", details: error?.message || String(error) },
+      { error: "Failed to fetch price config" },
       { status: 500 }
     );
   }
