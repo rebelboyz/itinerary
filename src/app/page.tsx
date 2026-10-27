@@ -151,7 +151,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="space-y-20 pb-20">
+    <div className="space-y-20 pb-20 w-full max-w-full overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-emerald-950 via-slate-900 to-slate-900 text-white pt-20 pb-28">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px]" />
@@ -163,45 +163,45 @@ export default function HomePage() {
               <span>{t.hero.badge}</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight sm:leading-tight mb-6">
-              {t.hero.title1} <br />
-              <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight mb-4 sm:mb-6">
+              {t.hero.title1}{" "}
+              <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent block sm:inline">
                 {t.hero.titleHighlight}
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-8">{t.hero.subtitle}</p>
+            <p className="text-sm sm:text-lg text-slate-300 leading-relaxed mb-6 sm:mb-8">{t.hero.subtitle}</p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
                 href="/plan"
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl text-sm font-bold text-slate-900 bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-500/30 transition transform hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:px-7 sm:py-4 rounded-xl text-sm sm:text-base font-bold text-slate-900 bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-500/30 transition transform active:scale-98 min-h-[48px] touch-manipulation"
               >
-                <Compass className="w-5 h-5 text-emerald-950" />
+                <Compass className="w-5 h-5 text-emerald-950 shrink-0" />
                 <span>{t.hero.ctaBuilder}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="#inquire"
-                className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-sm font-bold text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 transition"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:px-6 sm:py-4 rounded-xl text-sm sm:text-base font-bold text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 transition min-h-[48px] touch-manipulation"
               >
                 <span>{t.hero.ctaInquiry}</span>
               </a>
             </div>
 
             {/* Guarantees bar */}
-            <div className="mt-12 pt-8 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs text-slate-400">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{t.hero.guaranteeRefund}</span>
+            <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-xs sm:text-sm text-slate-300">
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span className="font-medium">{t.hero.guaranteeRefund}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Car className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{t.hero.guaranteeAllInclusive}</span>
+              <div className="flex items-center gap-2.5">
+                <Car className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span className="font-medium">{t.hero.guaranteeAllInclusive}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{t.hero.guaranteeFleet}</span>
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span className="font-medium">{t.hero.guaranteeFleet}</span>
               </div>
             </div>
           </div>
@@ -217,75 +217,78 @@ export default function HomePage() {
           <p className="text-sm text-slate-600">{t.features.whyChooseSub}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-7 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5 font-bold text-xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-8">
+          <div className="bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 font-bold text-2xl">
               🛣️
             </div>
-            <h3 className="text-base font-bold text-slate-900 mb-2">{t.features.card1Title}</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">{t.features.card1Desc}</p>
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2">{t.features.card1Title}</h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{t.features.card1Desc}</p>
           </div>
 
-          <div className="bg-white p-7 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-            <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center mb-5 font-bold text-xl">
+          <div className="bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+            <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center mb-4 font-bold text-2xl">
               🚙
             </div>
-            <h3 className="text-base font-bold text-slate-900 mb-2">{t.features.card2Title}</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">{t.features.card2Desc}</p>
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2">{t.features.card2Title}</h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{t.features.card2Desc}</p>
           </div>
 
-          <div className="bg-white p-7 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-5 font-bold text-xl">
+          <div className="bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4 font-bold text-2xl">
               🛡️
             </div>
-            <h3 className="text-base font-bold text-slate-900 mb-2">{t.features.card3Title}</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">{t.features.card3Desc}</p>
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2">{t.features.card3Title}</h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{t.features.card3Desc}</p>
           </div>
         </div>
       </section>
 
       {/* Destinations Spotlight */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-4">
           <div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {t.destinations.sectionTitle}
             </h2>
-            <p className="text-sm text-slate-600 mt-1">{t.destinations.sectionSubtitle}</p>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">{t.destinations.sectionSubtitle}</p>
           </div>
           <Link
             href="/plan"
-            className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 group"
+            className="text-xs sm:text-sm font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 group self-start sm:self-auto min-h-[38px]"
           >
             <span>{t.destinations.planNow}</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {destinations.map((dest, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between hover:border-emerald-300 hover:shadow-lg transition group"
+              className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 flex flex-col justify-between hover:border-emerald-300 hover:shadow-lg transition group"
             >
               <div>
-                <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md mb-3">
+                <span className="inline-block text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg mb-3">
                   {dest.tag}
                 </span>
-                <h3 className="font-bold text-slate-900 group-hover:text-emerald-600 transition mb-1 text-base">
+                <h3 className="font-bold text-slate-900 group-hover:text-emerald-600 transition mb-1.5 text-base sm:text-lg">
                   {dest.name}
                 </h3>
-                <div className="flex items-center gap-1 text-slate-400 text-xs mb-3">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="flex items-center gap-1.5 text-slate-500 text-xs sm:text-sm mb-3 font-medium">
+                  <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>{dest.region}</span>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">{dest.desc}</p>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{dest.desc}</p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-slate-500">{dest.category}</span>
-                <Link href="/plan" className="text-xs font-bold text-emerald-600 hover:text-emerald-800">
-                  {t.destinations.addToTrip}
+              <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-slate-500 truncate">{dest.category}</span>
+                <Link
+                  href="/plan"
+                  className="text-xs sm:text-sm font-bold text-emerald-600 hover:text-emerald-800 shrink-0 min-h-[36px] flex items-center"
+                >
+                  {t.destinations.addToTrip} &rarr;
                 </Link>
               </div>
             </div>

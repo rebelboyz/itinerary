@@ -12,8 +12,6 @@ export interface Translations {
     finance: string;
     login: string;
     logout: string;
-    quickSwitch: string;
-    role: string;
   };
   hero: {
     badge: string;
@@ -189,8 +187,6 @@ export const translations: Record<Locale, Translations> = {
       finance: "Finance Portal",
       login: "Login",
       logout: "Logout",
-      quickSwitch: "Quick Switch Role (Local Dev)",
-      role: "Role",
     },
     hero: {
       badge: "East Java Custom Tour & Travel Platform",
@@ -372,8 +368,6 @@ export const translations: Record<Locale, Translations> = {
       finance: "财务结算",
       login: "登录",
       logout: "退出登录",
-      quickSwitch: "快捷角色切换 (开发模式)",
-      role: "当前角色",
     },
     hero: {
       badge: "印尼东爪哇火山专业定制旅游平台",
@@ -550,8 +544,6 @@ export const translations: Record<Locale, Translations> = {
       finance: "Portal Finance",
       login: "Masuk",
       logout: "Keluar",
-      quickSwitch: "Ganti Role Cepat (Dev Lokal)",
-      role: "Role",
     },
     hero: {
       badge: "Platform Rencana Perjalanan Custom No. 1 Jawa Timur",

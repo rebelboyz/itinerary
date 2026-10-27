@@ -530,10 +530,10 @@ export default function ItineraryBuilderPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-48 md:pb-8 w-full max-w-full overflow-x-hidden">
       {/* Title Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 mb-1">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-emerald-600 mb-1">
           <Sparkles className="w-4 h-4" />
           <span>{t.builder.badge}</span>
         </div>
@@ -689,12 +689,12 @@ export default function ItineraryBuilderPage() {
 
           {/* Vehicle Selection Card */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Car className="w-4 h-4 text-emerald-600" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Car className="w-5 h-5 text-emerald-600 shrink-0" />
                 <span>{t.builder.vehicleTitle}</span>
               </h2>
-              <span className="text-[11px] text-slate-400">{t.builder.vehicleNote}</span>
+              <span className="text-xs text-slate-500">{t.builder.vehicleNote}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
@@ -722,24 +722,24 @@ export default function ItineraryBuilderPage() {
                         />
                       )}
                       {isRecommended && (
-                        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-600 text-white tracking-wide uppercase shadow-sm">
+                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold bg-emerald-600 text-white tracking-wide uppercase shadow-sm">
                           {t.builder.recommended}
                         </span>
                       )}
-                      <span className="absolute bottom-2 left-2 bg-slate-900/75 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1">
-                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                      <span className="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur-sm text-white px-2 py-0.5 rounded text-xs font-semibold flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                         <span>{v.rating || 4.9}</span>
-                        <span className="text-[9px] text-slate-300">({v.reviewCount || 75})</span>
+                        <span className="text-xs text-slate-300">({v.reviewCount || 75})</span>
                       </span>
                     </div>
 
-                    <div className="p-3 space-y-1.5">
-                      <div className="font-bold text-xs text-slate-900">{localizeItem(v.name, locale)}</div>
-                      <div className="text-[11px] text-slate-500">
+                    <div className="p-3.5 space-y-1.5">
+                      <div className="font-bold text-sm text-slate-900">{localizeItem(v.name, locale)}</div>
+                      <div className="text-xs text-slate-600">
                         {t.builder.capacity} {v.capacityMin}-{v.capacityMax} Pax
                       </div>
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                        <span className="text-xs font-bold text-emerald-700">
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                        <span className="font-bold text-emerald-700">
                           {formatPrice(v.ratePerKm)}/km
                         </span>
                         {v.googleMapsUrl && (
@@ -748,10 +748,10 @@ export default function ItineraryBuilderPage() {
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                             title="Lihat Pool Armada di Google Maps"
                           >
-                            <MapPin className="w-3 h-3 text-blue-500" />
+                            <MapPin className="w-3.5 h-3.5 text-blue-500" />
                             <span>Pool Maps</span>
                           </a>
                         )}
@@ -765,18 +765,18 @@ export default function ItineraryBuilderPage() {
 
           {/* Hotel Selection Card */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <HotelIcon className="w-4 h-4 text-emerald-600" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <HotelIcon className="w-5 h-5 text-emerald-600 shrink-0" />
                 <span>{t.builder.hotelTitle}</span>
               </h2>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-xs text-slate-500">
                 {daysCount > 1 ? `${daysCount - 1} ${t.builder.hotelNights}` : t.builder.hotelDayTrip}
               </span>
             </div>
 
-            <div className="text-[11px] text-indigo-800 bg-indigo-50 border border-indigo-200 px-3 py-2 rounded-xl flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+            <div className="text-xs text-indigo-900 bg-indigo-50 border border-indigo-200 px-3.5 py-2.5 rounded-xl flex items-start sm:items-center gap-2.5 leading-relaxed">
+              <Sparkles className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5 sm:mt-0" />
               <span>
                 {locale === "zh"
                   ? "智能大本营排程：从接送点出发优先送达酒店办理入住与休整洗漱，再出发展开游览，游览结束后专车返回酒店舒适过夜。"
@@ -808,18 +808,18 @@ export default function ItineraryBuilderPage() {
                           className="w-full h-full object-cover"
                         />
                       )}
-                      <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-white/90 px-2 py-0.5 rounded shadow-sm">
+                      <span className="absolute top-2 left-2 text-xs font-bold uppercase tracking-wider text-emerald-800 bg-white/95 px-2 py-0.5 rounded shadow-sm">
                         {h.hotelClass}
                       </span>
-                      <span className="absolute bottom-2 left-2 bg-slate-900/75 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1">
-                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                      <span className="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur-sm text-white px-2 py-0.5 rounded text-xs font-semibold flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                         <span>{h.rating || 4.8}</span>
-                        <span className="text-[9px] text-slate-300">({h.reviewCount || 85})</span>
+                        <span className="text-xs text-slate-300">({h.reviewCount || 85})</span>
                       </span>
                     </div>
 
-                    <div className="p-3 space-y-1.5">
-                      <div className="flex items-center justify-between text-[11px] text-slate-400">
+                    <div className="p-3.5 space-y-1.5">
+                      <div className="flex items-center justify-between text-xs text-slate-500">
                         <span>{h.region}</span>
                         {h.googleMapsUrl && (
                           <a
@@ -827,15 +827,15 @@ export default function ItineraryBuilderPage() {
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                             title="Buka Lokasi Hotel di Google Maps"
                           >
-                            <MapPin className="w-3 h-3 text-blue-500" />
+                            <MapPin className="w-3.5 h-3.5 text-blue-500" />
                             <span>Lokasi Maps</span>
                           </a>
                         )}
                       </div>
-                      <div className="font-bold text-xs text-slate-900 line-clamp-1">{h.name}</div>
+                      <div className="font-bold text-sm text-slate-900 line-clamp-1">{h.name}</div>
                       <div className="text-xs font-bold text-emerald-700 pt-1 border-t border-slate-100">
                         {formatPrice(h.pricePerRoomPerNight)} {locale === "zh" ? "/间/晚" : locale === "en" ? "/room/night" : "/kamar/mlm"}
                       </div>
@@ -850,17 +850,17 @@ export default function ItineraryBuilderPage() {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                  <Users className="w-4 h-4" />
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                  <Users className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 flex-wrap">
                     <span>{t.builder.guideOptionTitle}</span>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
                       {includeGuide ? t.builder.withGuideTitle : t.builder.withoutGuideTitle}
                     </span>
                   </h3>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     {t.builder.guideOptionSub}
                   </p>
                 </div>
@@ -882,24 +882,24 @@ export default function ItineraryBuilderPage() {
                     includeGuide ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-white"
                   }`}
                 >
-                  {includeGuide && <Check className="w-3 h-3 stroke-[3]" />}
+                  {includeGuide && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                 </div>
 
                 <div className="space-y-1.5 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-extrabold text-xs text-slate-900">
+                    <span className="font-extrabold text-sm text-slate-900">
                       {t.builder.withGuideTitle}
                     </span>
-                    <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full font-bold">
                       {t.builder.recommendedBadge}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     {t.builder.withGuideDesc}
                   </p>
                   <div className="text-xs font-extrabold text-indigo-700 pt-1">
                     +{formatPrice(guideRatePerDay)} / {locale === "zh" ? "天" : locale === "en" ? "day" : "hari"}
-                    <span className="text-[10px] font-normal text-slate-400 ml-1">
+                    <span className="text-xs font-normal text-slate-500 ml-1">
                       ({daysCount} {locale === "zh" ? "天总计" : locale === "en" ? "days total" : "hari"} = {formatPrice(guideRatePerDay * daysCount)})
                     </span>
                   </div>
@@ -920,24 +920,24 @@ export default function ItineraryBuilderPage() {
                     !includeGuide ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-300 bg-white"
                   }`}
                 >
-                  {!includeGuide && <Check className="w-3 h-3 stroke-[3]" />}
+                  {!includeGuide && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                 </div>
 
                 <div className="space-y-1.5 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-extrabold text-xs text-slate-900">
+                    <span className="font-extrabold text-sm text-slate-900">
                       {t.builder.withoutGuideTitle}
                     </span>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">
+                    <span className="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">
                       {t.builder.noGuidePrice}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     {t.builder.withoutGuideDesc}
                   </p>
                   <div className="text-xs font-extrabold text-emerald-700 pt-1">
                     {t.builder.noGuidePrice}
-                    <span className="text-[10px] font-normal text-slate-400 ml-1">
+                    <span className="text-xs font-normal text-slate-500 ml-1">
                       ({locale === "zh" ? "无需支付导游费" : locale === "en" ? "No guide fee charged" : "Bebas biaya guide"})
                     </span>
                   </div>
@@ -954,14 +954,14 @@ export default function ItineraryBuilderPage() {
                 <button
                   key={d.dayNumber}
                   onClick={() => setActiveDayIndex(idx)}
-                  className={`px-4 py-3 text-xs font-bold border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${
+                  className={`px-4 py-3 text-xs sm:text-sm font-bold border-b-2 whitespace-nowrap transition flex items-center gap-1.5 ${
                     activeDayIndex === idx
                       ? "border-emerald-600 text-emerald-700 bg-white"
                       : "border-transparent text-slate-500 hover:text-slate-800"
                   }`}
                 >
                   <span>{t.builder.dayPrefix} {d.dayNumber} {locale === "zh" ? "天" : ""}</span>
-                  <span className="px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700 text-[10px]">
+                  <span className="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 text-xs font-semibold">
                     {d.destinationIds.length + d.activityIds.length} POI
                   </span>
                 </button>
@@ -983,7 +983,7 @@ export default function ItineraryBuilderPage() {
                   <>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex-1">
-                        <label className="block text-xs font-bold text-slate-800 mb-1">
+                        <label className="block text-xs sm:text-sm font-bold text-slate-800 mb-1">
                           {t.builder.dayThemeLabel} ({t.builder.dayPrefix} {currentDay.dayNumber})
                         </label>
                         <input
@@ -997,7 +997,7 @@ export default function ItineraryBuilderPage() {
                               )
                             );
                           }}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 font-bold text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 font-bold text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm"
                         />
                       </div>
 
@@ -1014,7 +1014,7 @@ export default function ItineraryBuilderPage() {
                               )
                             );
                           }}
-                          className="self-end sm:self-auto text-[11px] font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition"
+                          className="self-end sm:self-auto text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition"
                         >
                           {t.builder.resetDayBtn}
                         </button>
@@ -1023,14 +1023,14 @@ export default function ItineraryBuilderPage() {
 
                     {/* Destinasi Checklist for this day */}
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
                           <span>{t.builder.chooseDestinations} ({t.builder.dayPrefix} {currentDay.dayNumber}):</span>
-                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                          <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
                             {currentDay.destinationIds.length} {t.builder.selectedCount}
                           </span>
                         </h3>
-                        <span className="text-[11px] font-normal text-slate-400">
+                        <span className="text-xs font-normal text-slate-500">
                           {t.builder.clickToToggle}
                         </span>
                       </div>
@@ -1042,7 +1042,7 @@ export default function ItineraryBuilderPage() {
                             <div
                               key={dest.id}
                               onClick={() => toggleDestinationInDay(activeDayIndex, dest.id)}
-                              className={`p-3 rounded-2xl border text-xs text-left cursor-pointer flex items-center justify-between gap-3 transition ${
+                              className={`p-3.5 rounded-2xl border text-xs sm:text-sm text-left cursor-pointer flex items-center justify-between gap-3 transition ${
                                 isAdded
                                   ? "border-emerald-600 bg-emerald-50/80 text-emerald-950 font-semibold ring-2 ring-emerald-500/20"
                                   : "border-slate-200 hover:border-slate-300 bg-white text-slate-700"
@@ -1050,7 +1050,7 @@ export default function ItineraryBuilderPage() {
                             >
                               <div className="flex items-center gap-3 min-w-0">
                                 {/* Destination Photo Thumbnail */}
-                                <div className="w-14 h-14 rounded-xl bg-slate-100 overflow-hidden shrink-0 relative">
+                                <div className="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 relative">
                                   {dest.imageUrl ? (
                                     <img
                                       src={dest.imageUrl}
@@ -1065,10 +1065,10 @@ export default function ItineraryBuilderPage() {
                                 </div>
 
                                 <div className="min-w-0">
-                                  <div className="font-bold text-xs text-slate-900 truncate">
+                                  <div className="font-bold text-sm text-slate-900 truncate">
                                     {localizeItem(dest.name, locale)}
                                   </div>
-                                  <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                  <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
                                     <span>{dest.region}</span>
                                     <span>•</span>
                                     <span className="font-semibold text-emerald-700">
@@ -1076,8 +1076,8 @@ export default function ItineraryBuilderPage() {
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2 mt-1">
-                                    <span className="text-[10px] text-amber-700 font-bold flex items-center gap-0.5">
-                                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                    <span className="text-xs text-amber-700 font-bold flex items-center gap-0.5">
+                                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                                       <span>{dest.rating || 4.9}</span>
                                       <span className="text-slate-400 font-normal">({dest.reviewCount || 120})</span>
                                     </span>
@@ -1087,10 +1087,10 @@ export default function ItineraryBuilderPage() {
                                         target="_blank"
                                         rel="noreferrer"
                                         onClick={(e) => e.stopPropagation()}
-                                        className="text-[10px] font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-0.5"
+                                        className="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-0.5"
                                         title="Buka Lokasi Google Maps"
                                       >
-                                        <MapPin className="w-3 h-3 text-blue-500" />
+                                        <MapPin className="w-3.5 h-3.5 text-blue-500" />
                                         <span>Maps</span>
                                       </a>
                                     )}
@@ -1115,14 +1115,14 @@ export default function ItineraryBuilderPage() {
 
                     {/* Optional Activities for this day */}
                     <div className="pt-4 border-t border-slate-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
                           <span>{t.builder.activitiesTitle}</span>
-                          <span className="text-[10px] font-bold text-teal-700 bg-teal-100 px-2 py-0.5 rounded-full">
+                          <span className="text-xs font-bold text-teal-700 bg-teal-100 px-2.5 py-0.5 rounded-full">
                             {currentDay.activityIds.length} {t.builder.selectedCount}
                           </span>
                         </h3>
-                        <span className="text-[11px] text-slate-400">{t.builder.activitiesSub}</span>
+                        <span className="text-xs text-slate-500">{t.builder.activitiesSub}</span>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -1133,15 +1133,15 @@ export default function ItineraryBuilderPage() {
                               type="button"
                               key={act.id}
                               onClick={() => toggleActivityInDay(activeDayIndex, act.id)}
-                              className={`p-3 rounded-xl border text-xs text-left cursor-pointer flex items-center justify-between transition ${
+                              className={`p-3 rounded-xl border text-xs sm:text-sm text-left cursor-pointer flex items-center justify-between transition ${
                                 isAdded
                                   ? "border-teal-600 bg-teal-50/80 text-teal-950 font-semibold ring-2 ring-teal-500/20"
                                   : "border-slate-200 hover:border-slate-300 bg-white text-slate-700"
                               }`}
                             >
                               <div>
-                                <div className="font-semibold text-slate-900">{localizeItem(act.name, locale)}</div>
-                                <div className="text-[11px] text-teal-700 font-medium mt-0.5">
+                                <div className="font-semibold text-sm text-slate-900">{localizeItem(act.name, locale)}</div>
+                                <div className="text-xs text-teal-700 font-medium mt-0.5">
                                   +{formatPrice(act.ticketPrice)} {t.builder.perPerson}
                                 </div>
                               </div>
@@ -1162,14 +1162,14 @@ export default function ItineraryBuilderPage() {
 
                     {/* Meal Add-ons */}
                     <div className="pt-4 border-t border-slate-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
                           <span>{t.builder.mealsTitle}</span>
-                          <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                          <span className="text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">
                             {currentDay.mealIds.length} {t.builder.selectedCount}
                           </span>
                         </h3>
-                        <span className="text-[11px] text-slate-400">{t.builder.mealsSub}</span>
+                        <span className="text-xs text-slate-500">{t.builder.mealsSub}</span>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -1180,15 +1180,15 @@ export default function ItineraryBuilderPage() {
                               type="button"
                               key={meal.id}
                               onClick={() => toggleMealInDay(activeDayIndex, meal.id)}
-                              className={`p-3 rounded-xl border text-xs text-left cursor-pointer flex items-center justify-between transition ${
+                              className={`p-3 rounded-xl border text-xs sm:text-sm text-left cursor-pointer flex items-center justify-between transition ${
                                 isAdded
                                   ? "border-amber-600 bg-amber-50/80 text-amber-950 font-semibold ring-2 ring-amber-500/20"
                                   : "border-slate-200 hover:border-slate-300 bg-white text-slate-700"
                               }`}
                             >
                               <div>
-                                <div className="font-semibold text-slate-900">{localizeItem(meal.name, locale)}</div>
-                                <div className="text-[11px] text-amber-700 font-medium mt-0.5">
+                                <div className="font-semibold text-sm text-slate-900">{localizeItem(meal.name, locale)}</div>
+                                <div className="text-xs text-amber-700 font-medium mt-0.5">
                                   +{formatPrice(meal.pricePerPax)} {t.builder.perPerson}
                                 </div>
                               </div>
@@ -1217,22 +1217,22 @@ export default function ItineraryBuilderPage() {
         <div className="lg:col-span-4 sticky top-20 space-y-4">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-5 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Compass className="w-4 h-4 text-emerald-600" />
                 <span>{t.builder.pricingTitle}</span>
               </h2>
               {isCalculating ? (
-                <span className="text-[10px] text-emerald-600 animate-pulse font-semibold">
+                <span className="text-xs text-emerald-600 animate-pulse font-semibold">
                   {t.builder.calculating}
                 </span>
               ) : (
-                <span className="text-[10px] text-slate-400">{t.builder.formulaLabel}</span>
+                <span className="text-xs text-slate-400">{t.builder.formulaLabel}</span>
               )}
             </div>
 
             {/* Price Itemized List */}
             {pricing ? (
-              <div className="space-y-2 text-xs text-slate-600">
+              <div className="space-y-2 text-xs sm:text-sm text-slate-600">
                 <div className="flex justify-between">
                   <span>{t.builder.distanceLabel}</span>
                   <span className="font-semibold text-slate-900">{pricing.distanceKm} km</span>
@@ -1271,12 +1271,12 @@ export default function ItineraryBuilderPage() {
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 flex justify-between text-slate-500">
+                <div className="pt-2 border-t border-slate-100 flex justify-between text-slate-500 text-xs">
                   <span>{t.builder.subtotalLabel}</span>
                   <span>{formatPrice(pricing.subtotal)}</span>
                 </div>
 
-                <div className="flex justify-between text-emerald-700">
+                <div className="flex justify-between text-emerald-700 text-xs sm:text-sm font-medium">
                   <span>{t.builder.marginLabel} ({pricing.marginPercent * 100}%):</span>
                   <span>+{formatPrice(pricing.marginAmount)}</span>
                 </div>
@@ -1284,21 +1284,21 @@ export default function ItineraryBuilderPage() {
                 {/* Total Highlight */}
                 <div className="pt-3 border-t-2 border-slate-200 mt-2">
                   <div className="flex items-baseline justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-900">{t.builder.totalLabel}</span>
-                    <span className="text-xl font-extrabold text-emerald-600">
+                    <span className="text-sm font-bold text-slate-900">{t.builder.totalLabel}</span>
+                    <span className="text-2xl font-extrabold text-emerald-600">
                       {formatPrice(pricing.totalAmount)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-slate-500">
+                  <div className="flex items-center justify-between text-xs sm:text-sm text-slate-500">
                     <span>{t.builder.perPersonLabel} ({numPax} Pax):</span>
                     <span className="font-bold text-slate-800">{formatPrice(pricing.pricePerPax)}</span>
                   </div>
 
                   {/* Multi-currency display helper (PRD §8) */}
-                  <div className="mt-2 pt-2 border-t border-dashed border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                  <div className="mt-2.5 pt-2 border-t border-dashed border-slate-200 flex items-center justify-between text-xs text-slate-400">
                     <span>{t.builder.foreignCurrencyEstimate}</span>
-                    <span>
+                    <span className="font-medium text-slate-600">
                       {formatUSD(pricing.pricePerPax)} / {formatCNY(pricing.pricePerPax)}
                     </span>
                   </div>
@@ -1316,11 +1316,11 @@ export default function ItineraryBuilderPage() {
 
             {/* Refund & Payment Guarantee */}
             <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100 space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-800">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>{t.builder.refundBadgeTitle}</span>
               </div>
-              <p className="text-[11px] text-emerald-700 leading-relaxed">
+              <p className="text-xs text-emerald-700 leading-relaxed">
                 {t.builder.refundBadgeDesc}
               </p>
             </div>
@@ -1331,7 +1331,7 @@ export default function ItineraryBuilderPage() {
                 type="button"
                 onClick={handleSaveItinerary}
                 disabled={isSavingDraft || isSubmitting || !pricing}
-                className="w-full py-3 px-4 rounded-xl text-xs font-bold text-slate-800 bg-white hover:bg-slate-50 border-2 border-emerald-500/70 hover:border-emerald-600 transition flex items-center justify-center gap-2 disabled:opacity-50 shadow-xs"
+                className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-slate-800 bg-white hover:bg-slate-50 border-2 border-emerald-500/70 hover:border-emerald-600 transition flex items-center justify-center gap-2 disabled:opacity-50 shadow-xs"
               >
                 <Bookmark className="w-4 h-4 text-emerald-600" />
                 <span>
@@ -1353,7 +1353,7 @@ export default function ItineraryBuilderPage() {
                 type="button"
                 onClick={handleProceedToCheckout}
                 disabled={isSubmitting || isSavingDraft || !pricing}
-                className="w-full py-3.5 px-4 rounded-xl text-xs font-bold text-slate-900 bg-emerald-400 hover:bg-emerald-300 shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3.5 px-4 rounded-xl text-sm font-bold text-slate-900 bg-emerald-400 hover:bg-emerald-300 shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <span>{t.builder.processingTrip}</span>
@@ -1366,6 +1366,51 @@ export default function ItineraryBuilderPage() {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Sticky Price & Checkout Bar (docked directly above BottomNav) */}
+      <div className="md:hidden fixed bottom-above-nav left-0 right-0 z-40 bg-slate-950/98 backdrop-blur-md border-t border-slate-800 px-4 py-2.5 shadow-[0_-6px_20px_rgba(0,0,0,0.35)] flex items-center justify-between gap-3 w-full max-w-full">
+        <div className="min-w-0 flex-1">
+          <div className="text-xs text-slate-300 truncate flex items-center gap-1.5 font-medium">
+            <span>{daysCount} {locale === "zh" ? "天" : locale === "en" ? "Days" : "Hari"}</span>
+            <span>•</span>
+            <span>{numPax} Pax</span>
+          </div>
+          <div className="text-base sm:text-lg font-black text-emerald-400 tracking-tight leading-tight mt-0.5">
+            {pricing ? formatPrice(pricing.totalAmount) : "..."}
+            {pricing && (
+              <span className="text-xs font-normal text-slate-400 ml-1">
+                ({formatPrice(pricing.pricePerPax)}/pax)
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleSaveItinerary}
+            disabled={isSavingDraft || isSubmitting || !pricing}
+            className="p-2.5 rounded-xl text-slate-200 bg-slate-800 hover:bg-slate-700 active:scale-95 border border-slate-700 transition disabled:opacity-50 touch-manipulation"
+            title="Simpan Draft"
+          >
+            <Bookmark className="w-4 h-4 text-emerald-400" />
+          </button>
+          <button
+            type="button"
+            onClick={handleProceedToCheckout}
+            disabled={isSubmitting || isSavingDraft || !pricing}
+            className="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-950 bg-emerald-400 hover:bg-emerald-300 active:scale-95 transition flex items-center gap-1.5 shadow-md disabled:opacity-50 touch-manipulation"
+          >
+            {isSubmitting ? (
+              <span>...</span>
+            ) : (
+              <>
+                <span>{t.builder.checkoutBtn}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
+            )}
+          </button>
         </div>
       </div>
 
@@ -1395,17 +1440,17 @@ export default function ItineraryBuilderPage() {
               </button>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs sm:text-sm">
               <div className="font-bold text-slate-900">{savedTripData.title}</div>
-              <div className="flex items-center justify-between text-slate-600 text-[11px]">
+              <div className="flex items-center justify-between text-slate-600 text-xs">
                 <span>
                   {daysCount} {locale === "zh" ? "天" : locale === "en" ? "Days" : "Hari"} • {numPax} Pax
                 </span>
-                <span className="font-extrabold text-emerald-700 text-xs">
+                <span className="font-extrabold text-emerald-700 text-sm">
                   {formatPrice(savedTripData.totalAmount)}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-200">
+              <p className="text-xs text-slate-500 pt-1 border-t border-slate-200 leading-relaxed">
                 {locale === "zh"
                   ? "该行程方案已妥善收录至您的行程列表。您可以随时查看、继续编辑或直接结算预订。"
                   : locale === "en"
@@ -1418,7 +1463,7 @@ export default function ItineraryBuilderPage() {
               <button
                 type="button"
                 onClick={() => router.push("/itineraries")}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 transition flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 transition flex items-center justify-center gap-2"
               >
                 <Bookmark className="w-4 h-4 text-emerald-600" />
                 <span>
@@ -1433,7 +1478,7 @@ export default function ItineraryBuilderPage() {
               <button
                 type="button"
                 onClick={() => router.push(`/checkout?trip_id=${savedTripData.id}`)}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-slate-900 bg-emerald-400 hover:bg-emerald-300 shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-slate-900 bg-emerald-400 hover:bg-emerald-300 shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2"
               >
                 <span>
                   {locale === "zh"

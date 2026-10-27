@@ -504,8 +504,8 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 pb-48 md:pb-12 w-full max-w-full overflow-x-hidden">
+      <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           {t.checkout.title}
         </h1>
@@ -518,14 +518,14 @@ function CheckoutContent() {
         {/* Left Column: Form & Detailed Journey Breakdown (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           {/* Step 1: Customer Details */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
                 <Lock className="w-4 h-4 text-emerald-600" />
                 <span>{t.checkout.contactDetailsTitle}</span>
               </h2>
               {isContactFilled && (
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
+                <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                   <span>{locale === "zh" ? "信息已填写" : locale === "en" ? "Contact Info Complete" : "Data Lengkap ✓"}</span>
                 </span>
@@ -599,11 +599,11 @@ function CheckoutContent() {
 
           {/* Step 2: Dynamic Trip Journey & Travel Time Breakdown */}
           {activeTrip && (
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <Navigation className="w-4 h-4 text-emerald-600" />
-                  <h3 className="font-extrabold text-sm text-slate-900">
+                  <Navigation className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
                     {locale === "zh"
                       ? "详细行程路线与分段耗时预估"
                       : locale === "en"
@@ -612,8 +612,8 @@ function CheckoutContent() {
                   </h3>
                 </div>
                 {isContactFilled && (
-                  <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded border border-indigo-200 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
+                  <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded border border-indigo-200 flex items-center gap-1 self-start sm:self-auto">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                     <span>
                       {journeySchedule?.totalCalculatedDistanceKm || activeTrip.totalDistanceKm || 0} km total (
                       {journeySchedule?.hotel
@@ -637,14 +637,14 @@ function CheckoutContent() {
                 // Prompt to fill contact data first
                 <div className="bg-emerald-50/70 rounded-xl border border-dashed border-emerald-300 p-5 text-center space-y-2">
                   <Compass className="w-8 h-8 text-emerald-600 mx-auto animate-bounce" />
-                  <h4 className="font-bold text-xs text-slate-900">
+                  <h4 className="font-bold text-sm text-slate-900">
                     {locale === "zh"
                       ? "填写上方联系人信息后自动展开行程详情"
                       : locale === "en"
                       ? "Complete Contact Information to Unlock Itinerary Breakdown"
                       : "Rincian Estimasi Perjalanan Akan Terbuka Otomatis"}
                   </h4>
-                  <p className="text-[11px] text-slate-600 max-w-md mx-auto leading-relaxed">
+                  <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
                     {locale === "zh"
                       ? "请在上方的表格中填写您的姓名、邮箱与电话号码，系统将立即计算从出发接人点按序前往各景点直至终点送达的逐段行车距离、耗时与实景导航。"
                       : locale === "en"
@@ -657,25 +657,25 @@ function CheckoutContent() {
                 <div className="space-y-4 animate-in fade-in duration-300">
                   {/* Start Point: Pickup */}
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center justify-between text-xs sm:text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center">
+                        <span className="w-5 h-5 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center">
                           A
                         </span>
                         <strong className="text-slate-900">
                           {locale === "zh" ? "出发地 / 接机接人地点" : locale === "en" ? "Departure / Pickup Point" : "Titik Penjemputan (Pickup)"}
                         </strong>
                       </div>
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
+                      <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
                         {locale === "zh" ? "起点" : "Start Point"}
                       </span>
                     </div>
                     <div className="pl-7">
-                      <div className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+                      <div className="font-extrabold text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                         <span>{journeySchedule?.pickup.name}</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">
+                      <p className="text-xs text-slate-500 mt-1">
                         {locale === "zh"
                           ? `专车司机将驾驶 ${activeTrip.vehicleType?.name || "舒适商务车"}，持标有“${customerName}”的接机牌在约定时间迎候。`
                           : locale === "en"
@@ -691,13 +691,13 @@ function CheckoutContent() {
                     return (
                       <div key={day.id || dIdx} className="space-y-3 pt-2 border-t border-slate-100">
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                          <span className="text-xs font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                             {locale === "zh" ? `第 ${day.dayNumber} 天日程` : locale === "en" ? `Day ${day.dayNumber} Schedule` : `Hari ke-${day.dayNumber}`}
                           </span>
-                          <span className="text-xs font-bold text-slate-800">{day.title}</span>
+                          <span className="text-xs sm:text-sm font-bold text-slate-800">{day.title}</span>
                         </div>
 
-                        <div className="space-y-3 pl-2">
+                        <div className="space-y-3 pl-1 sm:pl-2">
                           {events.map((ev: any, evIdx: number) => {
                             // 1. HOTEL CHECK-IN & REFRESH
                             if (ev.type === "hotel_checkin") {
@@ -709,30 +709,30 @@ function CheckoutContent() {
                                       <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0">
                                         <Car className="w-3.5 h-3.5" />
                                       </div>
-                                      <div className="min-w-0 text-[11px]">
+                                      <div className="min-w-0 text-xs">
                                         <div className="flex items-center gap-1.5 font-bold text-slate-800 flex-wrap">
                                           <span className="text-slate-500 font-normal">{locale === "zh" ? "从" : locale === "en" ? "From" : "Dari"}</span>
                                           <span className="truncate max-w-[130px] text-slate-900 font-extrabold">{ev.fromName}</span>
-                                          <ArrowRight className="w-3 h-3 text-indigo-600 shrink-0" />
+                                          <ArrowRight className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                                           <span className="text-slate-500 font-normal">{locale === "zh" ? "前往酒店入住" : locale === "en" ? "To Hotel Basecamp" : "Ke Hotel Check-in"}</span>
                                           <span className="truncate max-w-[160px] text-indigo-900 font-extrabold">{ev.toName}</span>
                                         </div>
-                                        <div className="text-[10px] text-slate-500 mt-0.5 truncate">{ev.roadNote}</div>
+                                        <div className="text-xs text-slate-500 mt-0.5 truncate">{ev.roadNote}</div>
                                       </div>
                                     </div>
 
                                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                                      <span className="inline-block text-[10px] font-extrabold text-indigo-800 bg-white px-2 py-0.5 rounded shadow-xs border border-indigo-200">
+                                      <span className="inline-block text-xs font-extrabold text-indigo-800 bg-white px-2 py-0.5 rounded shadow-xs border border-indigo-200">
                                         {ev.legDistanceKm} km • {ev.legDuration}
                                       </span>
                                       <a
                                         href={ev.directionUrl}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-1 transition shrink-0"
+                                        className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-1 transition shrink-0"
                                       >
                                         <span>{locale === "zh" ? "路线导航" : locale === "en" ? "Directions" : "Peta Rute"}</span>
-                                        <ExternalLink className="w-2.5 h-2.5" />
+                                        <ExternalLink className="w-3 h-3" />
                                       </a>
                                     </div>
                                   </div>
@@ -753,13 +753,13 @@ function CheckoutContent() {
                                           </div>
                                         )}
                                         <div className="min-w-0">
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-extrabold text-xs text-indigo-950 truncate">{ev.hotel?.name}</span>
-                                            <span className="text-[10px] font-extrabold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full shrink-0">
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="font-extrabold text-xs sm:text-sm text-indigo-950 truncate">{ev.hotel?.name}</span>
+                                            <span className="text-xs font-extrabold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full shrink-0">
                                               {locale === "zh" ? "办理入住 & 休整" : locale === "en" ? "Check-in & Refresh" : "Check-in & Mandi/Istirahat"}
                                             </span>
                                           </div>
-                                          <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                                          <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                                             {locale === "zh"
                                               ? "专车送抵酒店，办理入住并将大件行李存入房间。您可先沐浴更衣、稍作休整，随后再精力充沛地开启接下来的行程。"
                                               : locale === "en"
@@ -774,11 +774,11 @@ function CheckoutContent() {
                                           href={ev.hotel.googleMapsUrl}
                                           target="_blank"
                                           rel="noreferrer"
-                                          className="text-[10px] font-bold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 px-2 py-1 rounded-lg flex items-center gap-1 shrink-0 transition border border-slate-200"
+                                          className="text-xs font-bold text-slate-600 hover:text-slate-800 bg-white hover:bg-slate-100 px-2 py-1 rounded-lg flex items-center gap-1 shrink-0 transition border border-slate-200"
                                         >
-                                          <MapPin className="w-3 h-3 text-red-500" />
+                                          <MapPin className="w-3.5 h-3.5 text-red-500" />
                                           <span>Hotel Maps</span>
-                                          <ExternalLink className="w-2.5 h-2.5" />
+                                          <ExternalLink className="w-3 h-3" />
                                         </a>
                                       )}
                                     </div>
@@ -798,36 +798,36 @@ function CheckoutContent() {
                                       <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
                                         <Navigation className="w-3.5 h-3.5" />
                                       </div>
-                                      <div className="min-w-0 text-[11px]">
+                                      <div className="min-w-0 text-xs">
                                         <div className="flex items-center gap-1.5 font-bold text-slate-800 flex-wrap">
                                           <span className="text-slate-500 font-normal">{locale === "zh" ? "从" : locale === "en" ? "From" : "Dari"}</span>
                                           <span className="truncate max-w-[130px] text-slate-900 font-extrabold">{localizeItem(fromName, locale)}</span>
-                                          <ArrowRight className="w-3 h-3 text-emerald-600 shrink-0" />
+                                          <ArrowRight className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                                           <span className="text-slate-500 font-normal">{locale === "zh" ? "前往" : locale === "en" ? "To" : "Ke"}</span>
                                           <span className="truncate max-w-[160px] text-emerald-900 font-extrabold">{localizeItem(toName, locale)}</span>
                                         </div>
-                                        <div className="text-[10px] text-slate-500 mt-0.5 truncate">{roadNote}</div>
+                                        <div className="text-xs text-slate-500 mt-0.5 truncate">{roadNote}</div>
                                       </div>
                                     </div>
 
                                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                                      <span className="inline-block text-[10px] font-extrabold text-emerald-800 bg-white px-2 py-0.5 rounded shadow-xs border border-emerald-200">
+                                      <span className="inline-block text-xs font-extrabold text-emerald-800 bg-white px-2 py-0.5 rounded shadow-xs border border-emerald-200">
                                         {legDistanceKm} km • {legDuration}
                                       </span>
                                       <a
                                         href={directionUrl}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-1 transition shrink-0"
+                                        className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-1 transition shrink-0"
                                       >
                                         <span>{locale === "zh" ? "路线导航" : locale === "en" ? "Directions" : "Peta Rute"}</span>
-                                        <ExternalLink className="w-2.5 h-2.5" />
+                                        <ExternalLink className="w-3 h-3" />
                                       </a>
                                     </div>
                                   </div>
 
                                   {/* Destination Stop Card */}
-                                  <div className="p-3 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition space-y-2 shadow-xs ml-2 sm:ml-4">
+                                  <div className="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition space-y-2 shadow-xs ml-2 sm:ml-4">
                                     <div className="flex items-start justify-between gap-2">
                                       <div className="flex items-start gap-2.5 min-w-0">
                                         {dest?.imageUrl ? (
@@ -843,16 +843,16 @@ function CheckoutContent() {
                                         )}
 
                                         <div className="min-w-0">
-                                          <div className="font-bold text-xs text-slate-900 truncate">
+                                          <div className="font-bold text-xs sm:text-sm text-slate-900 truncate">
                                             {localizeItem(rawName, locale)}
                                           </div>
-                                          <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                                          <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
                                             <span>{dest?.region || "Jawa Timur"}</span>
                                             <span>•</span>
                                             <span className="text-amber-600 font-bold flex items-center gap-0.5">
-                                              <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                                              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                                               <span>{dest?.rating || 4.9}</span>
-                                              <span className="text-[10px] text-slate-400">({dest?.reviewCount || 100})</span>
+                                              <span className="text-xs text-slate-400 font-normal">({dest?.reviewCount || 100})</span>
                                             </span>
                                           </div>
                                         </div>
@@ -863,11 +863,11 @@ function CheckoutContent() {
                                           href={dest.googleMapsUrl}
                                           target="_blank"
                                           rel="noreferrer"
-                                          className="text-[10px] font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-lg flex items-center gap-1 shrink-0 transition"
+                                          className="text-xs font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg flex items-center gap-1 shrink-0 transition"
                                         >
-                                          <MapPin className="w-3 h-3 text-red-500" />
+                                          <MapPin className="w-3.5 h-3.5 text-red-500" />
                                           <span>Pin Maps</span>
-                                          <ExternalLink className="w-2.5 h-2.5" />
+                                          <ExternalLink className="w-3 h-3" />
                                         </a>
                                       )}
                                     </div>
@@ -886,36 +886,36 @@ function CheckoutContent() {
                                       <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0">
                                         <Car className="w-3.5 h-3.5" />
                                       </div>
-                                      <div className="min-w-0 text-[11px]">
+                                      <div className="min-w-0 text-xs">
                                         <div className="flex items-center gap-1.5 font-bold text-slate-800 flex-wrap">
                                           <span className="text-slate-500 font-normal">{locale === "zh" ? "从" : locale === "en" ? "From" : "Dari"}</span>
                                           <span className="truncate max-w-[130px] text-slate-900 font-extrabold">{ev.fromName}</span>
-                                          <ArrowRight className="w-3 h-3 text-indigo-600 shrink-0" />
+                                          <ArrowRight className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                                           <span className="text-slate-500 font-normal">{locale === "zh" ? "返回酒店休整" : locale === "en" ? "Return to Hotel Base" : "Kembali ke Hotel"}</span>
                                           <span className="truncate max-w-[160px] text-indigo-900 font-extrabold">{ev.toName}</span>
                                         </div>
-                                        <div className="text-[10px] text-slate-500 mt-0.5 truncate">{ev.roadNote}</div>
+                                        <div className="text-xs text-slate-500 mt-0.5 truncate">{ev.roadNote}</div>
                                       </div>
                                     </div>
 
                                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                                      <span className="inline-block text-[10px] font-extrabold text-indigo-800 bg-white px-2 py-0.5 rounded shadow-xs border border-indigo-200">
+                                      <span className="inline-block text-xs font-extrabold text-indigo-800 bg-white px-2 py-0.5 rounded shadow-xs border border-indigo-200">
                                         {ev.legDistanceKm} km • {ev.legDuration}
                                       </span>
                                       <a
                                         href={ev.directionUrl}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-1 transition shrink-0"
+                                        className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-1 transition shrink-0"
                                       >
                                         <span>{locale === "zh" ? "路线导航" : locale === "en" ? "Directions" : "Peta Rute"}</span>
-                                        <ExternalLink className="w-2.5 h-2.5" />
+                                        <ExternalLink className="w-3 h-3" />
                                       </a>
                                     </div>
                                   </div>
 
                                   {/* Return Milestone Card */}
-                                  <div className="p-3 rounded-xl border border-indigo-200 bg-indigo-50/30 flex items-center gap-2.5 ml-2 sm:ml-4 text-xs">
+                                  <div className="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/30 flex items-center gap-2.5 ml-2 sm:ml-4 text-xs">
                                     <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
                                       <Bed className="w-4 h-4" />
                                     </div>
@@ -923,7 +923,7 @@ function CheckoutContent() {
                                       <div className="font-extrabold text-indigo-950 flex items-center gap-2">
                                         <span>{locale === "zh" ? "返回酒店休息与沐浴" : locale === "en" ? "Return to Hotel (Shower & Rest)" : "Kembali ke Hotel (Mandi, Santai & Istirahat)"}</span>
                                       </div>
-                                      <p className="text-[11px] text-slate-500 mt-0.5">
+                                      <p className="text-xs text-slate-500 mt-0.5">
                                         {locale === "zh"
                                           ? "今日行程圆满结束，专车送您安全返回酒店。您可以尽情沐浴洗去风尘、享用晚餐并安心过夜休息。"
                                           : locale === "en"
@@ -939,7 +939,7 @@ function CheckoutContent() {
                             // 4. CHECKOUT HOTEL
                             if (ev.type === "hotel_checkout") {
                               return (
-                                <div key={`checkout-${evIdx}`} className="p-3 rounded-xl border border-amber-200 bg-amber-50/40 flex items-center gap-2.5 ml-2 sm:ml-4 text-xs">
+                                <div key={`checkout-${evIdx}`} className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/40 flex items-center gap-2.5 ml-2 sm:ml-4 text-xs">
                                   <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
                                     <Sparkles className="w-4 h-4" />
                                   </div>
@@ -947,7 +947,7 @@ function CheckoutContent() {
                                     <div className="font-extrabold text-amber-950 flex items-center gap-2">
                                       <span>{locale === "zh" ? "酒店退房与行李装车" : locale === "en" ? "Hotel Checkout & Luggage Loading" : "Checkout Hotel & Muat Koper ke Mobil"}</span>
                                     </div>
-                                    <p className="text-[11px] text-slate-600 mt-0.5">
+                                    <p className="text-xs text-slate-600 mt-0.5">
                                       {locale === "zh"
                                         ? "享用早餐后办理退房手续。专车司机协助您将所有行李稳妥装入车内，准备启程前往终点站。"
                                         : locale === "en"
@@ -975,7 +975,7 @@ function CheckoutContent() {
                           <div className="w-6 h-6 rounded-lg bg-rose-500 text-white flex items-center justify-center shrink-0">
                             <Navigation className="w-3.5 h-3.5" />
                           </div>
-                          <div className="min-w-0 text-[11px]">
+                          <div className="min-w-0 text-xs">
                             <div className="flex items-center gap-1.5 font-bold text-slate-800 flex-wrap">
                               <span className="text-slate-500 font-normal">
                                 {locale === "zh" ? "从" : locale === "en" ? "From" : "Dari"}
@@ -983,7 +983,7 @@ function CheckoutContent() {
                               <span className="truncate max-w-[130px] text-slate-900 font-extrabold">
                                 {localizeItem(journeySchedule.finalLeg.fromName, locale)}
                               </span>
-                              <ArrowRight className="w-3 h-3 text-rose-500 shrink-0" />
+                              <ArrowRight className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                               <span className="text-slate-500 font-normal">
                                 {locale === "zh" ? "前往送达终点" : locale === "en" ? "To Drop-off" : "Ke Pengantaran Akhir"}
                               </span>
@@ -991,50 +991,50 @@ function CheckoutContent() {
                                 {journeySchedule.finalLeg.toName}
                               </span>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5 truncate">
+                            <div className="text-xs text-slate-500 mt-0.5 truncate">
                               {journeySchedule.finalLeg.roadNote}
                             </div>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                          <span className="inline-block text-[10px] font-extrabold text-rose-800 bg-white px-2 py-0.5 rounded shadow-xs border border-rose-200">
+                          <span className="inline-block text-xs font-extrabold text-rose-800 bg-white px-2 py-0.5 rounded shadow-xs border border-rose-200">
                             {journeySchedule.finalLeg.legDistanceKm} km • {journeySchedule.finalLeg.legDuration}
                           </span>
                           <a
                             href={journeySchedule.finalLeg.directionUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-1 transition shrink-0"
+                            className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-lg flex items-center gap-1 transition shrink-0"
                             title={locale === "zh" ? "在谷歌地图中打开导航路线" : locale === "en" ? "Open Driving Route Directions" : "Buka Navigasi Rute Google Maps"}
                           >
                             <span>{locale === "zh" ? "路线导航" : locale === "en" ? "Directions" : "Peta Rute"}</span>
-                            <ExternalLink className="w-2.5 h-2.5" />
+                            <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
                       </div>
 
                       {/* End Point: Drop-off Card */}
                       <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center justify-between text-xs sm:text-sm">
                           <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+                            <span className="w-5 h-5 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center">
                               B
                             </span>
                             <strong className="text-slate-900">
                               {locale === "zh" ? "终点送达 / 离境地点" : locale === "en" ? "Final Destination / Drop-off" : "Titik Pengantaran Akhir (Drop-off)"}
                             </strong>
                           </div>
-                          <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">
+                          <span className="text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded">
                             {locale === "zh" ? "终点" : "Finish Point"}
                           </span>
                         </div>
                         <div className="pl-7">
-                          <div className="font-extrabold text-xs text-slate-900 flex items-center gap-1.5">
+                          <div className="font-extrabold text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
                             <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                             <span>{journeySchedule?.dropoff.name}</span>
                           </div>
-                          <p className="text-[11px] text-slate-500 mt-1">
+                          <p className="text-xs text-slate-500 mt-1">
                             {locale === "zh"
                               ? "行程圆满结束，司机将协助您办理行李装卸、渡轮码头登船或机场值机指引。"
                               : locale === "en"
@@ -1051,18 +1051,18 @@ function CheckoutContent() {
           )}
 
           {/* Step 3: Payment Method Notice */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <h2 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-emerald-600" />
               <span>{t.checkout.paymentMethodTitle}</span>
             </h2>
 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+              <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>{t.checkout.paymentHighlight}</span>
               </div>
-              <p className="text-[11px] text-slate-500 leading-relaxed">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 {t.checkout.paymentDesc}
               </p>
             </div>
@@ -1078,19 +1078,19 @@ function CheckoutContent() {
 
         {/* Right Summary Column (5 cols) */}
         <div className="lg:col-span-5 sticky top-20 space-y-4">
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-md space-y-4">
-            <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100">
+          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-md space-y-4">
+            <h2 className="text-sm sm:text-base font-bold text-slate-900 pb-3 border-b border-slate-100">
               {t.checkout.summaryTitle}
             </h2>
 
             {activeTrip && (
-              <div className="space-y-3 text-xs">
+              <div className="space-y-3 text-xs sm:text-sm">
                 <div>
-                  <div className="text-[11px] text-slate-400">{t.checkout.tripPlanTitle}</div>
-                  <div className="font-bold text-slate-900 text-sm">{activeTrip.title}</div>
+                  <div className="text-xs text-slate-400">{t.checkout.tripPlanTitle}</div>
+                  <div className="font-bold text-slate-900 text-sm sm:text-base">{activeTrip.title}</div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs">
                   <div>
                     <span className="text-slate-400">{t.checkout.participants}</span>
                     <div className="font-semibold text-slate-800">{activeTrip.numPax} {locale === "zh" ? "人" : "Pax"} ({activeTrip.tripType})</div>
@@ -1101,7 +1101,7 @@ function CheckoutContent() {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 space-y-1">
+                <div className="pt-2 border-t border-slate-100 space-y-1 text-xs">
                   <div className="flex items-center gap-1.5 text-slate-600">
                     <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <span>{t.checkout.pickup} <strong>{activeTrip.pickupPoint}</strong></span>
@@ -1112,7 +1112,7 @@ function CheckoutContent() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 space-y-1.5 text-slate-600">
+                <div className="pt-3 border-t border-slate-100 space-y-1.5 text-slate-600 text-xs sm:text-sm">
                   <div className="flex justify-between">
                     <span>{t.checkout.transport} ({activeTrip.totalDistanceKm || 0} km):</span>
                     <span>{formatPrice(activeTrip.transportCost || 0)}</span>
@@ -1137,14 +1137,14 @@ function CheckoutContent() {
 
                 <div className="pt-3 border-t-2 border-slate-200 mt-2">
                   <div className="flex justify-between items-baseline mb-1">
-                    <span className="font-bold text-slate-900 text-sm">{t.checkout.totalPayment}</span>
-                    <span className="font-extrabold text-xl text-emerald-600">
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{t.checkout.totalPayment}</span>
+                    <span className="font-extrabold text-xl sm:text-2xl text-emerald-600">
                       {formatPrice(totalAmount)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-[11px] text-slate-400">
+                  <div className="flex justify-between text-xs text-slate-400">
                     <span>{locale === "zh" ? "外币估算:" : locale === "en" ? "Est. Currencies:" : "Perkiraan Mata Uang:"}</span>
-                    <span>{formatUSD(totalAmount)} / {formatCNY(totalAmount)} (IDR: {formatIDR(totalAmount)})</span>
+                    <span className="font-medium text-slate-600">{formatUSD(totalAmount)} / {formatCNY(totalAmount)} (IDR: {formatIDR(totalAmount)})</span>
                   </div>
                 </div>
               </div>
@@ -1152,11 +1152,11 @@ function CheckoutContent() {
 
             {/* 48 Hour Cancellation Policy Alert */}
             <div className="bg-amber-50 rounded-xl p-3 border border-amber-200 text-amber-900 space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-bold">
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold">
                 <Clock className="w-4 h-4 text-amber-700 shrink-0" />
                 <span>{t.checkout.cancellationAlertTitle}</span>
               </div>
-              <p className="text-[11px] text-amber-800 leading-relaxed">
+              <p className="text-xs text-amber-800 leading-relaxed">
                 {t.checkout.cancellationAlertDesc}
               </p>
             </div>
@@ -1165,7 +1165,7 @@ function CheckoutContent() {
             <button
               onClick={handlePayNow}
               disabled={isProcessingPayment}
-              className="w-full py-3.5 px-4 rounded-xl text-xs font-bold text-slate-900 bg-emerald-400 hover:bg-emerald-300 shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-slate-900 bg-emerald-400 hover:bg-emerald-300 shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isProcessingPayment ? (
                 <span>{t.checkout.connectingGateway}</span>
@@ -1180,6 +1180,34 @@ function CheckoutContent() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Sticky Pay Bar (docked directly above BottomNav) */}
+      {activeTrip && (
+        <div className="md:hidden fixed bottom-above-nav left-0 right-0 z-40 bg-slate-950/98 backdrop-blur-md border-t border-slate-800 px-4 py-2.5 shadow-[0_-6px_20px_rgba(0,0,0,0.35)] flex items-center justify-between gap-3 w-full max-w-full">
+          <div className="min-w-0 flex-1">
+            <div className="text-xs text-slate-300 truncate font-medium">
+              {activeTrip.title}
+            </div>
+            <div className="text-base sm:text-lg font-black text-emerald-400 tracking-tight leading-tight mt-0.5">
+              {formatPrice(totalAmount)}
+            </div>
+          </div>
+          <button
+            onClick={handlePayNow}
+            disabled={isProcessingPayment}
+            className="px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-950 bg-emerald-400 hover:bg-emerald-300 active:scale-95 transition flex items-center gap-1.5 shadow-md shadow-emerald-500/25 disabled:opacity-50 shrink-0 touch-manipulation"
+          >
+            {isProcessingPayment ? (
+              <span>...</span>
+            ) : (
+              <>
+                <CreditCard className="w-4 h-4" />
+                <span>{locale === "zh" ? "立即支付" : locale === "en" ? "Pay Now" : "Bayar Sekarang"}</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

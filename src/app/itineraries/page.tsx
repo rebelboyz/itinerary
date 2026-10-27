@@ -144,22 +144,22 @@ function ItinerariesContent() {
     switch (status) {
       case "confirmed":
         return (
-          <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          <span className="text-xs font-extrabold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
             <span>{locale === "zh" ? "已确认出发" : locale === "en" ? "Confirmed" : "Terkonfirmasi"}</span>
           </span>
         );
       case "booked":
         return (
-          <span className="text-[10px] font-extrabold text-blue-800 bg-blue-100 border border-blue-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-            <CreditCard className="w-3 h-3 text-blue-600" />
+          <span className="text-xs font-extrabold text-blue-800 bg-blue-100 border border-blue-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+            <CreditCard className="w-3.5 h-3.5 text-blue-600" />
             <span>{locale === "zh" ? "待支付 / 结算中" : locale === "en" ? "Booked" : "Menunggu Pembayaran"}</span>
           </span>
         );
       default:
         return (
-          <span className="text-[10px] font-extrabold text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-            <Bookmark className="w-3 h-3 text-amber-600" />
+          <span className="text-xs font-extrabold text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+            <Bookmark className="w-3.5 h-3.5 text-amber-600" />
             <span>{locale === "zh" ? "草稿方案" : locale === "en" ? "Draft Saved" : "Draft / Tersimpan"}</span>
           </span>
         );
@@ -167,12 +167,12 @@ function ItinerariesContent() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 pb-32 md:pb-10 space-y-8 w-full max-w-full overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded">
               {locale === "zh" ? "我的行程管家" : locale === "en" ? "My Travel Portfolio" : "Itinerary Traveler"}
             </span>
           </div>
@@ -300,7 +300,7 @@ function ItinerariesContent() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           {getStatusBadge(trip.status)}
-                          <span className="text-[11px] font-semibold text-slate-400">
+                          <span className="text-xs font-semibold text-slate-400">
                             {new Date(trip.createdAt).toLocaleDateString(
                               locale === "zh" ? "zh-CN" : locale === "en" ? "en-US" : "id-ID",
                               { year: "numeric", month: "short", day: "numeric" }
@@ -314,11 +314,11 @@ function ItinerariesContent() {
 
                       {/* Pricing and Action */}
                       <div className="flex items-center gap-3 self-start sm:self-center">
-                        <div className="text-right">
-                          <div className="text-lg font-black text-emerald-600 leading-tight">
+                        <div className="text-left sm:text-right">
+                          <div className="text-lg sm:text-xl font-black text-emerald-600 leading-tight">
                             {formatPrice(trip.totalAmount)}
                           </div>
-                          <div className="text-[10px] font-semibold text-slate-400">
+                          <div className="text-xs font-semibold text-slate-400">
                             {formatPrice(trip.pricePerPax)} / Pax ({trip.numPax} Pax)
                           </div>
                         </div>
@@ -392,13 +392,13 @@ function ItinerariesContent() {
                     {/* Visited Destinations Preview */}
                     {allDestinations.length > 0 && (
                       <div className="pt-2 border-t border-slate-100 flex items-center gap-2 flex-wrap">
-                        <span className="text-[11px] font-bold text-slate-500">
+                        <span className="text-xs font-bold text-slate-500">
                           {locale === "zh" ? "游览景点：" : locale === "en" ? "Destinations:" : "Destinasi:"}
                         </span>
                         {allDestinations.map((d) => (
                           <div
                             key={d.id}
-                            className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] font-medium"
+                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-xs font-medium"
                           >
                             {d.imageUrl && (
                               <img
@@ -463,14 +463,14 @@ function ItinerariesContent() {
 
                       {/* Pickup Point */}
                       <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-[10px]">
+                        <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs">
                           A
                         </span>
                         <div>
-                          <span className="text-slate-400 text-[10px] block">
+                          <span className="text-slate-400 text-xs block">
                             {locale === "zh" ? "出发地 / 接机地点" : locale === "en" ? "Pickup Point" : "Titik Penjemputan"}
                           </span>
-                          <span className="font-bold text-slate-900">{trip.pickupPoint}</span>
+                          <span className="font-bold text-slate-900 text-xs sm:text-sm">{trip.pickupPoint}</span>
                         </div>
                       </div>
 
@@ -479,10 +479,10 @@ function ItinerariesContent() {
                         <div className="p-2.5 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center gap-2">
                           <HotelIcon className="w-4 h-4 text-indigo-600 shrink-0" />
                           <div>
-                            <span className="text-indigo-600 text-[10px] block font-semibold">
+                            <span className="text-indigo-600 text-xs block font-semibold">
                               {locale === "zh" ? "大本营酒店" : locale === "en" ? "Operational Basecamp Hotel" : "Hotel Basecamp Utama"}
                             </span>
-                            <span className="font-bold text-indigo-950">{trip.hotel.name}</span>
+                            <span className="font-bold text-indigo-950 text-xs sm:text-sm">{trip.hotel.name}</span>
                           </div>
                         </div>
                       )}
@@ -491,15 +491,15 @@ function ItinerariesContent() {
                       {(trip.days || []).map((day: any) => (
                         <div key={day.id} className="p-3 rounded-xl bg-white border border-slate-200 space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded text-[10px]">
+                            <span className="font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded text-xs">
                               {locale === "zh" ? `第 ${day.dayNumber} 天` : locale === "en" ? `Day ${day.dayNumber}` : `Hari ke-${day.dayNumber}`}
                             </span>
-                            <span className="font-bold text-slate-800">{day.title}</span>
+                            <span className="font-bold text-slate-800 text-xs sm:text-sm">{day.title}</span>
                           </div>
 
                           <div className="pl-2 space-y-1.5">
                             {(day.items || []).map((item: any) => (
-                              <div key={item.id} className="flex items-center gap-2 text-slate-700">
+                              <div key={item.id} className="flex items-center gap-2 text-slate-700 text-xs">
                                 <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                                 <span className="font-semibold">
                                   {localizeItem(
@@ -515,14 +515,14 @@ function ItinerariesContent() {
 
                       {/* Drop-off Point */}
                       <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-full bg-rose-500 text-white font-bold flex items-center justify-center text-[10px]">
+                        <span className="w-5 h-5 rounded-full bg-rose-500 text-white font-bold flex items-center justify-center text-xs">
                           B
                         </span>
                         <div>
-                          <span className="text-slate-400 text-[10px] block">
+                          <span className="text-slate-400 text-xs block">
                             {locale === "zh" ? "终点送达 / 离境地点" : locale === "en" ? "Drop-off Point" : "Titik Pengantaran Akhir"}
                           </span>
-                          <span className="font-bold text-slate-900">{trip.dropoffPoint}</span>
+                          <span className="font-bold text-slate-900 text-xs sm:text-sm">{trip.dropoffPoint}</span>
                         </div>
                       </div>
                     </div>
