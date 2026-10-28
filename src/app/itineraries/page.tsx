@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   CreditCard,
+  Pencil,
 } from "lucide-react";
 import { useI18n } from "@/context/I18nContext";
 import { localizeItem } from "@/i18n/translations";
@@ -436,7 +437,25 @@ function ItinerariesContent() {
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {trip.status !== "confirmed" &&
+                          trip.booking?.status !== "confirmed" &&
+                          trip.booking?.status !== "paid" && (
+                            <Link
+                              href={`/plan?edit=${trip.id}`}
+                              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition border border-slate-200 shadow-2xs"
+                              title={locale === "zh" ? "修改此行程" : locale === "en" ? "Edit Plan" : "Ubah Itinerary"}
+                            >
+                              <Pencil className="w-3.5 h-3.5 text-slate-500" />
+                              <span>
+                                {locale === "zh"
+                                  ? "修改计划"
+                                  : locale === "en"
+                                  ? "Edit Plan"
+                                  : "Ubah Itinerary"}
+                              </span>
+                            </Link>
+                          )}
                         <Link
                           href={`/checkout?trip_id=${trip.id}`}
                           className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-extrabold text-xs shadow-sm flex items-center gap-1.5 transition"

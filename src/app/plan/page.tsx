@@ -24,6 +24,7 @@ import {
   CheckCircle2,
   X,
   Eye,
+  Pencil,
 } from "lucide-react";
 import { formatIDR, formatUSD, formatCNY } from "@/lib/utils";
 import { useI18n } from "@/context/I18nContext";
@@ -97,6 +98,9 @@ function ItineraryBuilderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const leadIdParam = searchParams.get("lead") || searchParams.get("leadId");
+  const editIdParam = searchParams.get("edit") || searchParams.get("tripId");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editTripId, setEditTripId] = useState<string | null>(null);
   const [leadCustomer, setLeadCustomer] = useState<{ id: string; name: string; email: string; phone?: string } | null>(null);
   const { t, locale, formatPrice, currency } = useI18n();
 
@@ -170,7 +174,7 @@ function ItineraryBuilderContent() {
   const [savedTripData, setSavedTripData] = useState<any>(null);
   const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false);
 
-  // Load master data
+  // Load master data and existing trip if in edit mode
   useEffect(() => {
     async function loadAll() {
       try {
@@ -200,47 +204,94 @@ function ItineraryBuilderContent() {
         setActivities(actList);
         setMeals(mealList);
 
-        // Pre-select default vehicle
-        if (vehList.length > 0) {
-          const rec = vehList.find((v: any) => v.capacityMin <= 2 && v.capacityMax >= 2) || vehList[0];
-          setSelectedVehicleId(rec.id);
+        // Check if editing existing trip
+        let loadedExisting = false;
+        if (editIdParam) {
+          try {
+            const tripRes = await fetch(`/api/trips?id=${editIdParam}`);
+            const tripData = await tripRes.json();
+            const existingTrip = tripData.trips?.[0];
+            if (existingTrip) {
+              loadedExisting = true;
+              setEditTripId(existingTrip.id);
+              setIsEditMode(true);
+              if (existingTrip.title) setTitle(existingTrip.title);
+              if (existingTrip.tripType) setTripType(existingTrip.tripType);
+              if (existingTrip.numPax) setNumPax(existingTrip.numPax);
+              if (existingTrip.startDate) {
+                setStartDate(new Date(existingTrip.startDate).toISOString().split("T")[0]);
+              }
+              if (existingTrip.pickupPoint) setPickupPoint(existingTrip.pickupPoint);
+              if (existingTrip.dropoffPoint) setDropoffPoint(existingTrip.dropoffPoint);
+              if (existingTrip.vehicleTypeId) setSelectedVehicleId(existingTrip.vehicleTypeId);
+              if (existingTrip.hotelId) setSelectedHotelId(existingTrip.hotelId);
+              setIncludeGuide(existingTrip.withGuide !== false);
+
+              if (existingTrip.days && existingTrip.days.length > 0) {
+                setDaysCount(existingTrip.days.length);
+                const mappedDays: DayPlan[] = existingTrip.days.map((d: any) => ({
+                  dayNumber: d.dayNumber,
+                  title: d.title || `Day ${d.dayNumber}`,
+                  destinationIds: (d.items || [])
+                    .filter((it: any) => it.type === "destination" && it.destinationId)
+                    .map((it: any) => it.destinationId),
+                  activityIds: (d.items || [])
+                    .filter((it: any) => it.type === "activity" && it.activityId)
+                    .map((it: any) => it.activityId),
+                  mealIds: [],
+                }));
+                setDays(mappedDays);
+              }
+            }
+          } catch (tripErr) {
+            console.error("Failed to load existing trip for edit:", tripErr);
+          }
         }
 
-        // Pre-populate with typical Jawa Timur destinations
-        if (destList.length >= 3) {
-          const bromo = destList.find((d: any) => d.name.toLowerCase().includes("bromo"));
-          const sewu = destList.find((d: any) => d.name.toLowerCase().includes("tumpak"));
-          const ijen = destList.find((d: any) => d.name.toLowerCase().includes("ijen"));
+        // If not editing, set standard default selections
+        if (!loadedExisting) {
+          // Pre-select default vehicle
+          if (vehList.length > 0) {
+            const rec = vehList.find((v: any) => v.capacityMin <= 2 && v.capacityMax >= 2) || vehList[0];
+            setSelectedVehicleId(rec.id);
+          }
 
-          setDays([
-            {
-              dayNumber: 1,
-              title: "Day 1: Surabaya Pickup & Bromo",
-              destinationIds: bromo ? [bromo.id] : [destList[0].id],
-              activityIds: [],
-              mealIds: [],
-            },
-            {
-              dayNumber: 2,
-              title: "Day 2: Bromo Sunrise & Tumpak Sewu",
-              destinationIds: sewu ? [sewu.id] : [destList[1].id],
-              activityIds: [],
-              mealIds: [],
-            },
-            {
-              dayNumber: 3,
-              title: "Day 3: Ijen Crater Blue Fire & Port Dropoff",
-              destinationIds: ijen ? [ijen.id] : [destList[2].id],
-              activityIds: [],
-              mealIds: [],
-            },
-          ]);
-        }
+          // Pre-populate with typical Jawa Timur destinations
+          if (destList.length >= 3) {
+            const bromo = destList.find((d: any) => d.name.toLowerCase().includes("bromo"));
+            const sewu = destList.find((d: any) => d.name.toLowerCase().includes("tumpak"));
+            const ijen = destList.find((d: any) => d.name.toLowerCase().includes("ijen"));
 
-        if (hotList.length > 0) {
-          // Standard hotel default
-          const standardHotel = hotList.find((h: any) => h.hotelClass === "standard") || hotList[0];
-          setSelectedHotelId(standardHotel.id);
+            setDays([
+              {
+                dayNumber: 1,
+                title: "Day 1: Surabaya Pickup & Bromo",
+                destinationIds: bromo ? [bromo.id] : [destList[0].id],
+                activityIds: [],
+                mealIds: [],
+              },
+              {
+                dayNumber: 2,
+                title: "Day 2: Bromo Sunrise & Tumpak Sewu",
+                destinationIds: sewu ? [sewu.id] : [destList[1].id],
+                activityIds: [],
+                mealIds: [],
+              },
+              {
+                dayNumber: 3,
+                title: "Day 3: Ijen Crater Blue Fire & Port Dropoff",
+                destinationIds: ijen ? [ijen.id] : [destList[2].id],
+                activityIds: [],
+                mealIds: [],
+              },
+            ]);
+          }
+
+          if (hotList.length > 0) {
+            // Standard hotel default
+            const standardHotel = hotList.find((h: any) => h.hotelClass === "standard") || hotList[0];
+            setSelectedHotelId(standardHotel.id);
+          }
         }
       } catch (err) {
         console.error("Failed to load builder data:", err);
@@ -250,7 +301,7 @@ function ItineraryBuilderContent() {
     }
 
     loadAll();
-  }, []);
+  }, [editIdParam]);
 
   // Sync trip type when pax changes
   const handlePaxChange = (pax: number) => {
@@ -311,7 +362,7 @@ function ItineraryBuilderContent() {
         numPax,
         tripDaysCount: daysCount,
         vehicleTypeId: selectedVehicleId,
-        hotelId: selectedHotelId || null,
+        hotelId: daysCount > 1 ? (selectedHotelId || null) : null,
         includeGuide,
         days: days.map((d) => ({
           dayNumber: d.dayNumber,
@@ -408,13 +459,14 @@ function ItineraryBuilderContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          tripId: editTripId || undefined,
           title,
           tripType,
           startDate: new Date(startDate),
           endDate: new Date(endDate),
           numPax,
           vehicleTypeId: selectedVehicleId,
-          hotelId: selectedHotelId || null,
+          hotelId: daysCount > 1 ? (selectedHotelId || null) : null,
           includeGuide,
           withGuide: includeGuide,
           pickupPoint,
@@ -481,13 +533,14 @@ function ItineraryBuilderContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          tripId: editTripId || undefined,
           title,
           tripType,
           startDate: new Date(startDate),
           endDate: new Date(endDate),
           numPax,
           vehicleTypeId: selectedVehicleId,
-          hotelId: selectedHotelId || null,
+          hotelId: daysCount > 1 ? (selectedHotelId || null) : null,
           includeGuide,
           withGuide: includeGuide,
           pickupPoint,
@@ -596,6 +649,29 @@ function ItineraryBuilderContent() {
           <span className="px-2 py-0.5 bg-blue-600 text-white font-bold rounded text-[11px]">
             {locale === "zh" ? "代理/客服报价模式" : locale === "en" ? "Agent/CS Proposal Mode" : "Mode Penawaran Agen/CS"}
           </span>
+        </div>
+      )}
+
+      {isEditMode && (
+        <div className="mb-6 p-3.5 bg-amber-50 border border-amber-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm text-amber-900 shadow-xs">
+          <div className="flex items-center gap-2">
+            <Pencil className="w-4 h-4 text-amber-700 shrink-0" />
+            <span>
+              <strong>{locale === "zh" ? "正在编辑已有行程方案：" : locale === "en" ? "Editing Saved Itinerary:" : "Mode Ubah Itinerary:"}</strong>{" "}
+              {title}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setEditTripId(null);
+              setIsEditMode(false);
+              router.push("/plan");
+            }}
+            className="px-2.5 py-1 bg-white hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold rounded-lg text-xs transition self-start sm:self-auto"
+          >
+            {locale === "zh" ? "退出编辑 (新建空白行程)" : locale === "en" ? "Exit Edit (New Plan)" : "Batal Edit / Buat Baru"}
+          </button>
         </div>
       )}
 
@@ -824,80 +900,97 @@ function ItineraryBuilderContent() {
                 <HotelIcon className="w-5 h-5 text-emerald-600 shrink-0" />
                 <span>{t.builder.hotelTitle}</span>
               </h2>
-              <span className="text-xs text-slate-500">
-                {daysCount > 1 ? `${daysCount - 1} ${t.builder.hotelNights}` : t.builder.hotelDayTrip}
+              <span className="text-xs text-slate-500 font-semibold">
+                {daysCount > 1
+                  ? `${daysCount - 1} ${t.builder.hotelNights}`
+                  : (locale === "zh" ? "单日游（无需住宿）" : locale === "en" ? "Day Trip (No Hotel)" : "Day Trip (Tanpa Hotel)")}
               </span>
             </div>
 
-            <div className="text-xs text-indigo-900 bg-indigo-50 border border-indigo-200 px-3.5 py-2.5 rounded-xl flex items-start sm:items-center gap-2.5 leading-relaxed">
-              <Sparkles className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5 sm:mt-0" />
-              <span>
-                {locale === "zh"
-                  ? "智能大本营排程：从接送点出发优先送达酒店办理入住与休整洗漱，再出发展开游览，游览结束后专车返回酒店舒适过夜。"
-                  : locale === "en"
-                  ? "Intelligent Basecamp Hub: Escorted to hotel to check in, drop luggage & freshen up first before daily excursions, returning for relaxing overnight rest."
-                  : "Sistem Basecamp Cerdas: Penjemputan langsung mengantar Anda ke hotel untuk check-in, menaruh koper, & mandi/bersiap terlebih dahulu sebelum tour, serta kembali untuk istirahat malam."}
-              </span>
-            </div>
+            {daysCount <= 1 ? (
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>
+                  {locale === "zh"
+                    ? "当日往返行程（1日游）无需酒店住宿。专车由出发点直接接送至各景点并在当天完成送机/送站，酒店费用已自动归零。"
+                    : locale === "en"
+                    ? "Single-day trips (1-day) do not require hotel accommodations. Driver transports you directly to attractions and drop-off today. Hotel cost is Rp 0."
+                    : "Untuk paket 1 hari (day trip), penginapan hotel tidak diperlukan. Armada langsung mengantar dari titik jemput ke objek wisata lalu ke titik dropoff. Biaya hotel otomatis Rp 0."}
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="text-xs text-indigo-900 bg-indigo-50 border border-indigo-200 px-3.5 py-2.5 rounded-xl flex items-start sm:items-center gap-2.5 leading-relaxed">
+                  <Sparkles className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5 sm:mt-0" />
+                  <span>
+                    {locale === "zh"
+                      ? "智能大本营排程：从接送点出发优先送达酒店办理入住与休整洗漱，再出发展开游览，游览结束后专车返回酒店舒适过夜。"
+                      : locale === "en"
+                      ? "Intelligent Basecamp Hub: Escorted to hotel to check in, drop luggage & freshen up first before daily excursions, returning for relaxing overnight rest."
+                      : "Sistem Basecamp Cerdas: Penjemputan langsung mengantar Anda ke hotel untuk check-in, menaruh koper, & mandi/bersiap terlebih dahulu sebelum tour, serta kembali untuk istirahat malam."}
+                  </span>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              {hotels.map((h) => {
-                const isSelected = selectedHotelId === h.id;
-                return (
-                  <div
-                    key={h.id}
-                    onClick={() => setSelectedHotelId(h.id)}
-                    className={`rounded-2xl border cursor-pointer transition relative overflow-hidden flex flex-col justify-between ${
-                      isSelected
-                        ? "border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-500/20"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
-                    }`}
-                  >
-                    {/* Hotel Photo */}
-                    <div className="relative h-28 w-full bg-slate-100 overflow-hidden">
-                      {h.imageUrl && (
-                        <img
-                          src={h.imageUrl}
-                          alt={h.name}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                      <span className="absolute top-2 left-2 text-xs font-bold uppercase tracking-wider text-emerald-800 bg-white/95 px-2 py-0.5 rounded shadow-sm">
-                        {h.hotelClass}
-                      </span>
-                      <span className="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur-sm text-white px-2 py-0.5 rounded text-xs font-semibold flex items-center gap-1">
-                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                        <span>{h.rating || 4.8}</span>
-                        <span className="text-xs text-slate-300">({h.reviewCount || 85})</span>
-                      </span>
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  {hotels.map((h) => {
+                    const isSelected = selectedHotelId === h.id;
+                    return (
+                      <div
+                        key={h.id}
+                        onClick={() => setSelectedHotelId(h.id)}
+                        className={`rounded-2xl border cursor-pointer transition relative overflow-hidden flex flex-col justify-between ${
+                          isSelected
+                            ? "border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-500/20"
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                        }`}
+                      >
+                        {/* Hotel Photo */}
+                        <div className="relative h-28 w-full bg-slate-100 overflow-hidden">
+                          {h.imageUrl && (
+                            <img
+                              src={h.imageUrl}
+                              alt={h.name}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          <span className="absolute top-2 left-2 text-xs font-bold uppercase tracking-wider text-emerald-800 bg-white/95 px-2 py-0.5 rounded shadow-sm">
+                            {h.hotelClass}
+                          </span>
+                          <span className="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur-sm text-white px-2 py-0.5 rounded text-xs font-semibold flex items-center gap-1">
+                            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                            <span>{h.rating || 4.8}</span>
+                            <span className="text-xs text-slate-300">({h.reviewCount || 85})</span>
+                          </span>
+                        </div>
 
-                    <div className="p-3.5 space-y-1.5">
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <span>{h.region}</span>
-                        {h.googleMapsUrl && (
-                          <a
-                            href={h.googleMapsUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline"
-                            title="Buka Lokasi Hotel di Google Maps"
-                          >
-                            <MapPin className="w-3.5 h-3.5 text-blue-500" />
-                            <span>Lokasi Maps</span>
-                          </a>
-                        )}
+                        <div className="p-3.5 space-y-1.5">
+                          <div className="flex items-center justify-between text-xs text-slate-500">
+                            <span>{h.region}</span>
+                            {h.googleMapsUrl && (
+                              <a
+                                href={h.googleMapsUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                                title="Buka Lokasi Hotel di Google Maps"
+                              >
+                                <MapPin className="w-3.5 h-3.5 text-blue-500" />
+                                <span>Lokasi Maps</span>
+                              </a>
+                            )}
+                          </div>
+                          <div className="font-bold text-sm text-slate-900 line-clamp-1">{h.name}</div>
+                          <div className="text-xs font-bold text-emerald-700 pt-1 border-t border-slate-100">
+                            {formatPrice(h.pricePerRoomPerNight)} {locale === "zh" ? "/间/晚" : locale === "en" ? "/room/night" : "/kamar/mlm"}
+                          </div>
+                        </div>
                       </div>
-                      <div className="font-bold text-sm text-slate-900 line-clamp-1">{h.name}</div>
-                      <div className="text-xs font-bold text-emerald-700 pt-1 border-t border-slate-100">
-                        {formatPrice(h.pricePerRoomPerNight)} {locale === "zh" ? "/间/晚" : locale === "en" ? "/room/night" : "/kamar/mlm"}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Step 3: Tour Guide Selection Option (Dengan / Tanpa Guide) */}

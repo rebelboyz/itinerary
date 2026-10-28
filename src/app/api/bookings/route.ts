@@ -160,6 +160,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
     }
 
+    // Check if booking already exists for this trip
+    const existingBooking = await prisma.booking.findUnique({
+      where: { tripId: trip.id },
+      include: { trip: true },
+    });
+
+    if (existingBooking) {
+      const updatedBooking = await prisma.booking.update({
+        where: { id: existingBooking.id },
+        data: {
+          totalAmount: trip.totalAmount,
+          customerName: customerName || existingBooking.customerName,
+          customerEmail: customerEmail || existingBooking.customerEmail,
+          customerPhone: customerPhone || existingBooking.customerPhone,
+        },
+        include: { trip: true },
+      });
+      return NextResponse.json({ success: true, booking: updatedBooking });
+    }
+
     const midtransOrderId = `ITN-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     const booking = await prisma.booking.create({

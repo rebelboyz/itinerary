@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculatePricingPure, marginTier } from "@/lib/pricing";
-import { calculateRouteDistanceKm, buildHotelCentricWaypoints, GeoPoint } from "@/lib/distance";
+import { calculateRouteDistanceKm, buildHotelCentricWaypoints, resolveLocationCoordinates, GeoPoint } from "@/lib/distance";
 import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
@@ -30,11 +30,12 @@ export async function POST(req: NextRequest) {
       if (v) vehicleRatePerKm = parseFloat(v.ratePerKm.toString());
     }
 
-    // 2. Hotel
+    // 2. Hotel (Only applicable if trip duration > 1 day, 0 nights for 1-day tours)
+    const daysCountInt = Math.max(1, parseInt(tripDaysCount || 1));
     let hotelPricePerNight = 0;
     let hotelPaxPerRoom = 2;
     let hotelData: any = null;
-    if (hotelId) {
+    if (hotelId && daysCountInt > 1) {
       const h = await prisma.hotel.findUnique({ where: { id: hotelId } });
       if (h) {
         hotelPricePerNight = parseFloat(h.pricePerRoomPerNight.toString());
@@ -97,16 +98,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    const pickupPointName = pickupPoint || "Surabaya Juanda Airport";
+    const dropoffPointName = dropoffPoint || pickupPointName;
+    const pickupCoords = resolveLocationCoordinates(pickupPointName, pickupLat, pickupLng);
+    const dropoffCoords = resolveLocationCoordinates(dropoffPointName, dropoffLat, dropoffLng);
+
     const pickupGeo: GeoPoint = {
-      lat: pickupLat || -7.3798,
-      lng: pickupLng || 112.7876,
-      name: pickupPoint || "Surabaya Juanda Airport",
+      lat: pickupCoords.lat,
+      lng: pickupCoords.lng,
+      name: pickupPointName,
     };
 
     const dropoffGeo: GeoPoint = {
-      lat: dropoffLat || (dropoffPoint?.includes("Ketapang") ? -8.1485 : pickupGeo.lat),
-      lng: dropoffLng || (dropoffPoint?.includes("Ketapang") ? 114.3985 : pickupGeo.lng),
-      name: dropoffPoint || "Dropoff Point",
+      lat: dropoffCoords.lat,
+      lng: dropoffCoords.lng,
+      name: dropoffPointName,
     };
 
     const hotelGeo = hotelData
@@ -166,7 +172,7 @@ export async function POST(req: NextRequest) {
     // 8. Calculate Pricing
     const pricing = calculatePricingPure(distanceKm, {
       numPax,
-      tripDaysCount,
+      tripDaysCount: daysCountInt,
       vehicleRatePerKm,
       hotelPricePerNight,
       hotelPaxPerRoom,

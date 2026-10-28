@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { calculatePricingPure, getPriceConfigRates } from "@/lib/pricing";
-import { calculateRouteDistanceKm, buildHotelCentricWaypoints, GeoPoint } from "@/lib/distance";
+import { calculateRouteDistanceKm, buildHotelCentricWaypoints, resolveLocationCoordinates, GeoPoint } from "@/lib/distance";
 
 export async function GET(req: NextRequest) {
   try {
@@ -206,16 +206,18 @@ export async function POST(req: NextRequest) {
       if (v) vehicleRatePerKm = parseFloat(v.ratePerKm.toString());
     }
 
-    // Hotel
+    // Hotel (Only applicable if trip duration > 1 day)
     let hotelPricePerNight = 0;
     let hotelPaxPerRoom = 2;
     let hotelData: any = null;
-    if (body.hotelId) {
+    let finalHotelId: string | null = null;
+    if (body.hotelId && tripDaysCount > 1) {
       const h = await prisma.hotel.findUnique({ where: { id: body.hotelId } });
       if (h) {
         hotelPricePerNight = parseFloat(h.pricePerRoomPerNight.toString());
         hotelPaxPerRoom = h.paxPerRoom;
         hotelData = h;
+        finalHotelId = h.id;
       }
     }
 
@@ -252,16 +254,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Waypoints for distance
+    // Waypoints for distance with accurate GPS coordinates resolution
+    const pickupPointName = body.pickupPoint || "Surabaya Juanda Airport";
+    const dropoffPointName = body.dropoffPoint || pickupPointName;
+    const pickupCoords = resolveLocationCoordinates(pickupPointName, body.pickupLat, body.pickupLng);
+    const dropoffCoords = resolveLocationCoordinates(dropoffPointName, body.dropoffLat, body.dropoffLng);
+
     const pickupGeo: GeoPoint = {
-      lat: body.pickupLat || -7.3798,
-      lng: body.pickupLng || 112.7876,
-      name: body.pickupPoint || "Surabaya Juanda Airport",
+      lat: pickupCoords.lat,
+      lng: pickupCoords.lng,
+      name: pickupPointName,
     };
     const dropoffGeo: GeoPoint = {
-      lat: body.dropoffLat || pickupGeo.lat,
-      lng: body.dropoffLng || pickupGeo.lng,
-      name: body.dropoffPoint || "Dropoff Point",
+      lat: dropoffCoords.lat,
+      lng: dropoffCoords.lng,
+      name: dropoffPointName,
     };
     const hotelGeo = hotelData
       ? { lat: hotelData.lat || -7.925, lng: hotelData.lng || 112.9972, name: hotelData.name }
@@ -312,62 +319,162 @@ export async function POST(req: NextRequest) {
       gatewayRate: rates.gatewayRate,
     });
 
-    // 4. Create Trip record with server-verified amounts
-    const trip = await prisma.trip.create({
-      data: {
-        userId,
-        leadId,
-        agentId,
-        title: body.title || "East Java Custom Adventure",
-        tripType: body.tripType || "private",
-        startDate: new Date(body.startDate || Date.now()),
-        endDate: new Date(body.endDate || Date.now() + 86400000),
-        numPax,
-        vehicleTypeId: body.vehicleTypeId,
-        hotelId: body.hotelId || null,
-        pickupPoint: body.pickupPoint || "Surabaya Juanda Airport",
-        pickupLat: body.pickupLat || -7.3798,
-        pickupLng: body.pickupLng || 112.7876,
-        dropoffPoint: body.dropoffPoint || "Surabaya Juanda Airport",
-        dropoffLat: body.dropoffLat || -7.3798,
-        dropoffLng: body.dropoffLng || 112.7876,
-        status: "draft",
-        totalDistanceKm: calculatedPricing.distanceKm,
-        transportCost: calculatedPricing.transportCost,
-        hotelCost: calculatedPricing.hotelCost,
-        ticketsCost: calculatedPricing.ticketsCost,
-        mealsCost: calculatedPricing.mealsCost,
-        guideCost: calculatedPricing.guideCost,
-        withGuide: includeGuide,
-        marginAmount: calculatedPricing.platformFeeAmount,
-        platformFeeAmount: calculatedPricing.platformFeeAmount,
-        marginTargetAmount: calculatedPricing.marginTargetAmount,
-        commissionReserveAmount: calculatedPricing.commissionReserveAmount,
-        gatewayFeeAmount: calculatedPricing.gatewayFeeAmount,
-        totalAmount: calculatedPricing.totalAmount,
-        pricePerPax: calculatedPricing.pricePerPax,
-        currency: "IDR",
-        days: {
-          create: rawDays.map((d: any, idx: number) => ({
-            dayNumber: d.dayNumber || idx + 1,
-            title: d.title || `Day ${idx + 1}`,
-            note: d.note || "",
-            items: {
-              create: (d.items || []).map((item: any, itemIdx: number) => ({
-                orderIndex: itemIdx,
-                type: item.type || "destination",
-                destinationId: item.destinationId || null,
-                activityId: item.activityId || null,
-                note: item.note || "",
-              })),
-            },
-          })),
+    // 4. Create or Update Trip record with server-verified amounts
+    const editTripId = body.tripId || body.id;
+    let trip;
+
+    if (editTripId) {
+      const existingTrip = await prisma.trip.findUnique({
+        where: { id: editTripId },
+        include: { booking: { include: { payments: true } } },
+      });
+
+      if (!existingTrip) {
+        return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+      }
+
+      // Check if settled payment already exists
+      const hasSettledPayment = existingTrip.booking?.payments?.some(
+        (p) => p.status === "settlement" || p.status === "capture"
+      );
+      if (hasSettledPayment) {
+        return NextResponse.json(
+          { error: "Trip sudah dibayar lunas dan tidak dapat diubah langsung" },
+          { status: 400 }
+        );
+      }
+
+      // Clear old days & items for this trip
+      await prisma.tripItem.deleteMany({
+        where: { tripDay: { tripId: existingTrip.id } },
+      });
+      await prisma.tripDay.deleteMany({
+        where: { tripId: existingTrip.id },
+      });
+
+      trip = await prisma.trip.update({
+        where: { id: existingTrip.id },
+        data: {
+          title: body.title || existingTrip.title,
+          tripType: body.tripType || existingTrip.tripType,
+          startDate: new Date(body.startDate || existingTrip.startDate),
+          endDate: new Date(body.endDate || Date.now() + 86400000),
+          numPax,
+          vehicleTypeId: body.vehicleTypeId,
+          hotelId: finalHotelId,
+          pickupPoint: body.pickupPoint || "Surabaya Juanda Airport",
+          pickupLat: pickupCoords.lat,
+          pickupLng: pickupCoords.lng,
+          dropoffPoint: body.dropoffPoint || "Surabaya Juanda Airport",
+          dropoffLat: dropoffCoords.lat,
+          dropoffLng: dropoffCoords.lng,
+          totalDistanceKm: calculatedPricing.distanceKm,
+          transportCost: calculatedPricing.transportCost,
+          hotelCost: calculatedPricing.hotelCost,
+          ticketsCost: calculatedPricing.ticketsCost,
+          mealsCost: calculatedPricing.mealsCost,
+          guideCost: calculatedPricing.guideCost,
+          withGuide: includeGuide,
+          marginAmount: calculatedPricing.platformFeeAmount,
+          platformFeeAmount: calculatedPricing.platformFeeAmount,
+          marginTargetAmount: calculatedPricing.marginTargetAmount,
+          commissionReserveAmount: calculatedPricing.commissionReserveAmount,
+          gatewayFeeAmount: calculatedPricing.gatewayFeeAmount,
+          totalAmount: calculatedPricing.totalAmount,
+          pricePerPax: calculatedPricing.pricePerPax,
+          currency: "IDR",
+          days: {
+            create: rawDays.map((d: any, idx: number) => ({
+              dayNumber: d.dayNumber || idx + 1,
+              title: d.title || `Day ${idx + 1}`,
+              note: d.note || "",
+              items: {
+                create: (d.items || []).map((item: any, itemIdx: number) => ({
+                  orderIndex: itemIdx,
+                  type: item.type || "destination",
+                  destinationId: item.destinationId || null,
+                  activityId: item.activityId || null,
+                  note: item.note || "",
+                })),
+              },
+            })),
+          },
         },
-      },
-      include: {
-        days: { include: { items: true } },
-      },
-    });
+        include: {
+          days: { include: { items: true } },
+          vehicleType: true,
+          hotel: true,
+        },
+      });
+
+      // If existing trip has a booking, keep booking totalAmount in sync
+      if (existingTrip.booking) {
+        await prisma.booking.update({
+          where: { id: existingTrip.booking.id },
+          data: {
+            totalAmount: calculatedPricing.totalAmount,
+          },
+        });
+      }
+    } else {
+      trip = await prisma.trip.create({
+        data: {
+          userId,
+          leadId,
+          agentId,
+          title: body.title || "East Java Custom Adventure",
+          tripType: body.tripType || "private",
+          startDate: new Date(body.startDate || Date.now()),
+          endDate: new Date(body.endDate || Date.now() + 86400000),
+          numPax,
+          vehicleTypeId: body.vehicleTypeId,
+          hotelId: finalHotelId,
+          pickupPoint: body.pickupPoint || "Surabaya Juanda Airport",
+          pickupLat: pickupCoords.lat,
+          pickupLng: pickupCoords.lng,
+          dropoffPoint: body.dropoffPoint || "Surabaya Juanda Airport",
+          dropoffLat: dropoffCoords.lat,
+          dropoffLng: dropoffCoords.lng,
+          status: "draft",
+          totalDistanceKm: calculatedPricing.distanceKm,
+          transportCost: calculatedPricing.transportCost,
+          hotelCost: calculatedPricing.hotelCost,
+          ticketsCost: calculatedPricing.ticketsCost,
+          mealsCost: calculatedPricing.mealsCost,
+          guideCost: calculatedPricing.guideCost,
+          withGuide: includeGuide,
+          marginAmount: calculatedPricing.platformFeeAmount,
+          platformFeeAmount: calculatedPricing.platformFeeAmount,
+          marginTargetAmount: calculatedPricing.marginTargetAmount,
+          commissionReserveAmount: calculatedPricing.commissionReserveAmount,
+          gatewayFeeAmount: calculatedPricing.gatewayFeeAmount,
+          totalAmount: calculatedPricing.totalAmount,
+          pricePerPax: calculatedPricing.pricePerPax,
+          currency: "IDR",
+          days: {
+            create: rawDays.map((d: any, idx: number) => ({
+              dayNumber: d.dayNumber || idx + 1,
+              title: d.title || `Day ${idx + 1}`,
+              note: d.note || "",
+              items: {
+                create: (d.items || []).map((item: any, itemIdx: number) => ({
+                  orderIndex: itemIdx,
+                  type: item.type || "destination",
+                  destinationId: item.destinationId || null,
+                  activityId: item.activityId || null,
+                  note: item.note || "",
+                })),
+              },
+            })),
+          },
+        },
+        include: {
+          days: { include: { items: true } },
+          vehicleType: true,
+          hotel: true,
+        },
+      });
+    }
 
     // 5. If created from Lead, advance lead to "quoted" and log activity
     if (leadId) {

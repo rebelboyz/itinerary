@@ -130,8 +130,8 @@ export function buildHotelCentricWaypoints(params: HotelCentricParams): GeoPoint
   const { pickup, dropoff, hotel, days } = params;
   const waypoints: GeoPoint[] = [];
 
-  // Fallback: If no hotel is selected (Day trip / transit without hotel stay)
-  if (!hotel || !hotel.lat || !hotel.lng) {
+  // Fallback: If no hotel is selected or Day trip (1-day tour without overnight hotel stay)
+  if (!hotel || !hotel.lat || !hotel.lng || days.length <= 1) {
     waypoints.push(pickup);
     for (const d of days) {
       for (const dest of d.destinations || []) {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ShieldCheck,
@@ -8,6 +9,8 @@ import {
   CheckCircle2,
   Lock,
   ArrowRight,
+  ArrowLeft,
+  Pencil,
   Compass,
   AlertCircle,
   Clock,
@@ -263,8 +266,8 @@ function CheckoutContent() {
       const items = day.items || [];
       const events: any[] = [];
 
-      // --- HARI 1: TRANSFER PICKUP KE HOTEL UNTUK CHECK-IN & BERSIAP-SIAP ---
-      if (isFirstDay && hotel && hotelCoords) {
+      // --- HARI 1: TRANSFER PICKUP KE HOTEL UNTUK CHECK-IN & BERSIAP-SIAP (HANYA MULTI-DAY TRIP) ---
+      if (isFirstDay && hotel && hotelCoords && totalDaysCount > 1) {
         const checkinDist = haversineDistanceKm(currentPoint.coords, hotelCoords);
         const checkinDur = formatDriveTime(checkinDist, locale);
         const checkinDirUrl = buildGoogleMapsDirectionUrl(currentPoint.coords, hotelCoords);
@@ -319,8 +322,8 @@ function CheckoutContent() {
         };
       });
 
-      // --- RETURN KE HOTEL (HARI 1 ATAU HARI PERTENGAHAN SETELAH TOUR) ---
-      if (!isLastDay && hotel && hotelCoords && items.length > 0) {
+      // --- RETURN KE HOTEL (HANYA MULTI-DAY SETELAH TOUR) ---
+      if (!isLastDay && hotel && hotelCoords && items.length > 0 && totalDaysCount > 1) {
         const returnDist = haversineDistanceKm(currentPoint.coords, hotelCoords);
         const returnDur = formatDriveTime(returnDist, locale);
         const returnDirUrl = buildGoogleMapsDirectionUrl(currentPoint.coords, hotelCoords);
@@ -345,8 +348,8 @@ function CheckoutContent() {
         };
       }
 
-      // --- CHECKOUT HOTEL DI HARI TERAKHIR ---
-      if (isLastDay && hotel && hotelCoords) {
+      // --- CHECKOUT HOTEL DI HARI TERAKHIR (HANYA MULTI-DAY TRIP) ---
+      if (isLastDay && hotel && hotelCoords && totalDaysCount > 1) {
         events.push({
           type: "hotel_checkout",
           hotel,
@@ -503,15 +506,41 @@ function CheckoutContent() {
     );
   }
 
+  const transportCost = Number(activeTrip?.transportCost) || 0;
+  const hotelCost = Number(activeTrip?.hotelCost) || 0;
+  const ticketsCost = Number(activeTrip?.ticketsCost) || 0;
+  const guideCost = Number(activeTrip?.guideCost) || 0;
+  const subtotalCost = transportCost + hotelCost + ticketsCost + guideCost;
+  const platformFeeCost =
+    Number(activeTrip?.platformFeeAmount || activeTrip?.marginAmount) ||
+    Math.max(0, totalAmount - subtotalCost);
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 pb-48 md:pb-12 w-full max-w-full overflow-x-hidden">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          {t.checkout.title}
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          {t.checkout.subtitle}
-        </p>
+      <div className="mb-6 sm:mb-8 space-y-3">
+        {activeTrip?.id && (
+          <Link
+            href={`/plan?edit=${activeTrip.id}`}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-700 bg-white hover:bg-emerald-50 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-300 transition shadow-xs"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-emerald-600" />
+            <span>
+              {locale === "zh"
+                ? "← 返回修改行程方案"
+                : locale === "en"
+                ? "← Back to Edit Plan"
+                : "← Ubah Rencana Itinerary"}
+            </span>
+          </Link>
+        )}
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            {t.checkout.title}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            {t.checkout.subtitle}
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -1115,23 +1144,42 @@ function CheckoutContent() {
                 <div className="pt-3 border-t border-slate-100 space-y-1.5 text-slate-600 text-xs sm:text-sm">
                   <div className="flex justify-between">
                     <span>{t.checkout.transport} ({activeTrip.totalDistanceKm || 0} km):</span>
-                    <span>{formatPrice(activeTrip.transportCost || 0)}</span>
+                    <span className="font-medium text-slate-800">{formatPrice(transportCost)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>{t.checkout.hotel}</span>
-                    <span>{formatPrice(activeTrip.hotelCost || 0)}</span>
+                    <span>
+                      {t.checkout.hotel}
+                      {((activeTrip.days || []).length <= 1 || !activeTrip.hotel) && (
+                        <span className="text-xs text-slate-400 ml-1">
+                          ({locale === "zh" ? "当日游无需住宿" : locale === "en" ? "Day trip / No hotel" : "1 Hari / Tanpa Hotel"})
+                        </span>
+                      )}
+                    </span>
+                    <span className="font-medium text-slate-800">{formatPrice(hotelCost)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>{t.checkout.tickets}</span>
-                    <span>{formatPrice(activeTrip.ticketsCost || 0)}</span>
+                    <span className="font-medium text-slate-800">{formatPrice(ticketsCost)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>{t.checkout.guide}</span>
-                    <span className={activeTrip.guideCost && parseFloat(activeTrip.guideCost.toString()) > 0 ? "text-slate-800" : "text-emerald-700 font-semibold"}>
-                      {activeTrip.guideCost && parseFloat(activeTrip.guideCost.toString()) > 0
-                        ? formatPrice(activeTrip.guideCost)
+                    <span className={guideCost > 0 ? "text-slate-800 font-medium" : "text-emerald-700 font-semibold"}>
+                      {guideCost > 0
+                        ? formatPrice(guideCost)
                         : (locale === "zh" ? "仅司机 / 无需导游 (0元)" : locale === "en" ? "Driver Only / No Guide (Rp 0)" : "Tanpa Guide / Driver Only (Rp 0)")}
                     </span>
+                  </div>
+
+                  {/* Subtotal */}
+                  <div className="pt-2 border-t border-slate-100 flex justify-between text-slate-500 text-xs">
+                    <span>{locale === "zh" ? "各项成本小计 (Subtotal):" : locale === "en" ? "Cost Subtotal:" : "Subtotal Biaya:"}</span>
+                    <span className="font-semibold text-slate-700">{formatPrice(subtotalCost)}</span>
+                  </div>
+
+                  {/* Platform Fee */}
+                  <div className="flex justify-between text-emerald-700 text-xs sm:text-sm font-medium">
+                    <span>{locale === "zh" ? "平台服务与保障费:" : locale === "en" ? "Platform Service Fee:" : "Biaya Layanan & Platform:"}</span>
+                    <span>+{formatPrice(platformFeeCost)}</span>
                   </div>
                 </div>
 
@@ -1177,6 +1225,23 @@ function CheckoutContent() {
                 </>
               )}
             </button>
+
+            {/* Edit Plan Secondary Action */}
+            {activeTrip?.id && (
+              <Link
+                href={`/plan?edit=${activeTrip.id}`}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition flex items-center justify-center gap-1.5"
+              >
+                <Pencil className="w-3.5 h-3.5 text-slate-500" />
+                <span>
+                  {locale === "zh"
+                    ? "修改此行程规划 (车型 / 景点 / 人数)"
+                    : locale === "en"
+                    ? "Edit Itinerary (Fleet / Dests / Pax)"
+                    : "Ubah Rencana (Armada / Destinasi / Pax)"}
+                </span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
