@@ -1,20 +1,33 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { SESSION_COOKIE_NAME, verifySessionToken } from "@/lib/auth-token";
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export async function middleware(request: NextRequest) {
+  const { pathname, searchParams } = request.nextUrl;
 
-  // Protected paths
+  // 1. Referral tracking: 30-day cookie (PRD §4.2 Jalur A)
+  const refParam = searchParams.get("ref");
+  let response = NextResponse.next();
+  if (refParam) {
+    response.cookies.set("refCode", refParam.toUpperCase().trim(), {
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: "/",
+      sameSite: "lax",
+    });
+  }
+
+  // 2. Protected paths
   const isAdminPath = pathname.startsWith("/admin");
   const isCsPath = pathname.startsWith("/cs");
   const isGuidePath = pathname.startsWith("/guide");
   const isFinancePath = pathname.startsWith("/finance");
+  const isAgentPath = pathname.startsWith("/agent");
 
-  if (!isAdminPath && !isCsPath && !isGuidePath && !isFinancePath) {
-    return NextResponse.next();
+  if (!isAdminPath && !isCsPath && !isGuidePath && !isFinancePath && !isAgentPath) {
+    return response;
   }
 
-  const sessionCookie = request.cookies.get("itinerary_id_session")?.value;
+  const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
   if (!sessionCookie) {
     const loginUrl = new URL("/login", request.url);
@@ -22,49 +35,50 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  try {
-    const raw = Buffer.from(sessionCookie, "base64url").toString("utf-8");
-    const user = JSON.parse(raw);
+  const user = await verifySessionToken(sessionCookie);
 
-    if (user.exp && user.exp < Date.now()) {
-      const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    const role = user.role;
-
-    // Role access control:
-    // Admin can access everything
-    if (role === "admin") {
-      return NextResponse.next();
-    }
-
-    if (isAdminPath && role !== "admin") {
-      return NextResponse.redirect(new URL("/unauthorized", request.url));
-    }
-
-    if (isCsPath && role !== "cs") {
-      return NextResponse.redirect(new URL("/unauthorized", request.url));
-    }
-
-    if (isGuidePath && role !== "guide") {
-      return NextResponse.redirect(new URL("/unauthorized", request.url));
-    }
-
-    if (isFinancePath && role !== "finance") {
-      return NextResponse.redirect(new URL("/unauthorized", request.url));
-    }
-
-    return NextResponse.next();
-  } catch {
+  // If token is invalid, tampered with, or expired
+  if (!user) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    const redirectRes = NextResponse.redirect(loginUrl);
+    redirectRes.cookies.delete(SESSION_COOKIE_NAME);
+    return redirectRes;
   }
+
+  const role = user.role;
+
+  // Admin can access everything
+  if (role === "admin") {
+    return response;
+  }
+
+  // Non-admins can only access their specific role area
+  if (isAdminPath) {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  if (isCsPath && role !== "cs") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  if (isGuidePath && role !== "guide") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  if (isFinancePath && role !== "finance") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  if (isAgentPath && role !== "agent") {
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
+  }
+
+  return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/cs/:path*", "/guide/:path*", "/finance/:path*"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
-

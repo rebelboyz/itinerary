@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Compass,
   Car,
@@ -34,10 +35,10 @@ export default function AdminPage() {
   const [priceConfigs, setPriceConfigs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Edit price configs
-  const [margin12, setMargin12] = useState("0.12");
-  const [margin35, setMargin35] = useState("0.08");
-  const [margin612, setMargin612] = useState("0.05");
+  // Edit price configs (PRD §5.6)
+  const [marginTarget, setMarginTarget] = useState("0.02");
+  const [commissionReserve, setCommissionReserve] = useState("0.03");
+  const [gatewayFeeRate, setGatewayFeeRate] = useState("0.025");
   const [guideRate, setGuideRate] = useState("500000");
   const [savingConfig, setSavingConfig] = useState(false);
 
@@ -124,9 +125,9 @@ export default function AdminPage() {
       setPriceConfigs(configs);
 
       configs.forEach((c: any) => {
-        if (c.key === "margin_1_2") setMargin12(c.value);
-        if (c.key === "margin_3_5") setMargin35(c.value);
-        if (c.key === "margin_6_12") setMargin612(c.value);
+        if (c.key === "margin_target_1_2") setMarginTarget(c.value);
+        if (c.key === "commission_reserve_1_2") setCommissionReserve(c.value);
+        if (c.key === "gateway_fee_rate") setGatewayFeeRate(c.value);
         if (c.key === "guide_rate_per_day") setGuideRate(c.value);
       });
     } catch (err) {
@@ -451,7 +452,7 @@ export default function AdminPage() {
     }
   };
 
-  // Save Margin & Guide configs
+  // Save Margin & Guide configs (PRD §5.6 & AC15)
   const handleSavePriceConfigs = async () => {
     setSavingConfig(true);
     try {
@@ -459,25 +460,45 @@ export default function AdminPage() {
         fetch("/api/price-config", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "margin_1_2", value: margin12 }),
+          body: JSON.stringify({ key: "margin_target_1_2", value: marginTarget, reason: "Admin UI update" }),
         }),
         fetch("/api/price-config", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "margin_3_5", value: margin35 }),
+          body: JSON.stringify({ key: "margin_target_3_5", value: marginTarget, reason: "Admin UI update" }),
         }),
         fetch("/api/price-config", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "margin_6_12", value: margin612 }),
+          body: JSON.stringify({ key: "margin_target_6_12", value: marginTarget, reason: "Admin UI update" }),
         }),
         fetch("/api/price-config", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: "guide_rate_per_day", value: guideRate }),
+          body: JSON.stringify({ key: "commission_reserve_1_2", value: commissionReserve, reason: "Admin UI update" }),
+        }),
+        fetch("/api/price-config", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: "commission_reserve_3_5", value: commissionReserve, reason: "Admin UI update" }),
+        }),
+        fetch("/api/price-config", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: "commission_reserve_6_12", value: commissionReserve, reason: "Admin UI update" }),
+        }),
+        fetch("/api/price-config", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: "gateway_fee_rate", value: gatewayFeeRate, reason: "Admin UI update" }),
+        }),
+        fetch("/api/price-config", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: "guide_rate_per_day", value: guideRate, reason: "Admin UI update" }),
         }),
       ]);
-      alert("Konfigurasi harga dan margin berhasil diperbarui!");
+      alert("Konfigurasi harga, margin target, dan cadangan komisi berhasil diperbarui!");
       loadAllAdminData();
     } catch (err) {
       console.error(err);
@@ -587,6 +608,13 @@ export default function AdminPage() {
         >
           Konfigurasi Margin & Guide
         </button>
+        <Link
+          href="/admin/agents"
+          className="pb-3 border-b-2 border-transparent text-indigo-600 hover:text-indigo-800 font-bold whitespace-nowrap transition flex items-center gap-1.5"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Mitra & Agen Afiliasi</span>
+        </Link>
       </div>
 
       {/* Tab 1: Bookings List */}
@@ -1019,54 +1047,54 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Tab 5: Pricing & Margin Config */}
+      {/* Tab 5: Pricing & Platform Fee Config (PRD §5.2, §5.6) */}
       {activeTab === "pricing" && (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6 max-w-2xl">
           <div className="space-y-1">
             <h3 className="text-sm font-bold text-slate-900">
-              Konfigurasi Margin Otomatis per Pax (PRD §7.3) & Tarif Guide
+              Konfigurasi Biaya Platform & Cadangan Komisi (PRD §5.2 & §5.6)
             </h3>
             <p className="text-xs text-slate-500">
-              Nilai persentase markup operasional yang diterapkan secara otomatis oleh sistem kalkulasi.
+              Komponen pembentuk satu baris Biaya Platform: Margin Target + Cadangan Komisi + Estimasi Gateway Gross-Up.
             </p>
           </div>
 
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Margin untuk Solo & Duo (1–2 Pax) — Default 12% (0.12)
+                Margin Target Perusahaan (Rate) — Default 2% (0.02)
               </label>
               <input
                 type="number"
-                step="0.01"
-                value={margin12}
-                onChange={(e) => setMargin12(e.target.value)}
+                step="0.005"
+                value={marginTarget}
+                onChange={(e) => setMarginTarget(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 font-mono font-bold text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm"
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Margin untuk Private Group (3–5 Pax) — Default 8% (0.08)
+                Cadangan Komisi Agen / Affiliate (Rate) — Default 3% (0.03)
               </label>
               <input
                 type="number"
-                step="0.01"
-                value={margin35}
-                onChange={(e) => setMargin35(e.target.value)}
+                step="0.005"
+                value={commissionReserve}
+                onChange={(e) => setCommissionReserve(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 font-mono font-bold text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm"
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Margin untuk Rombongan Besar (6–12 Pax) — Default 5% (0.05)
+                Estimasi Biaya Gateway Midtrans (Gross-up Rate) — Default 2.5% (0.025)
               </label>
               <input
                 type="number"
-                step="0.01"
-                value={margin612}
-                onChange={(e) => setMargin612(e.target.value)}
+                step="0.005"
+                value={gatewayFeeRate}
+                onChange={(e) => setGatewayFeeRate(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 font-mono font-bold text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-sm"
               />
             </div>

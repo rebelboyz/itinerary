@@ -6,11 +6,15 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding Itinerary ID database...");
 
-  // 1. Price Configs
+  // 1. Price Configs (PRD §5.2 & §5.6)
   const priceConfigs = [
-    { key: "margin_1_2", value: "0.12", description: "Markup margin untuk 1-2 pax (12%)" },
-    { key: "margin_3_5", value: "0.08", description: "Markup margin untuk 3-5 pax (8%)" },
-    { key: "margin_6_12", value: "0.05", description: "Markup margin untuk 6-12 pax (5%)" },
+    { key: "margin_target_1_2", value: "0.02", description: "Margin target perusahaan untuk 1-2 pax (2%)" },
+    { key: "margin_target_3_5", value: "0.02", description: "Margin target perusahaan untuk 3-5 pax (2%)" },
+    { key: "margin_target_6_12", value: "0.02", description: "Margin target perusahaan untuk 6-12 pax (2%)" },
+    { key: "commission_reserve_1_2", value: "0.03", description: "Cadangan komisi agen untuk 1-2 pax (3%)" },
+    { key: "commission_reserve_3_5", value: "0.03", description: "Cadangan komisi agen untuk 3-5 pax (3%)" },
+    { key: "commission_reserve_6_12", value: "0.03", description: "Cadangan komisi agen untuk 6-12 pax (3%)" },
+    { key: "gateway_fee_rate", value: "0.025", description: "Estimasi biaya payment gateway Midtrans (2.5%)" },
     { key: "guide_rate_per_day", value: "500000", description: "Tarif standar guide profesional per hari (IDR)" },
   ];
 
@@ -341,6 +345,16 @@ async function main() {
       preferredLanguage: "en",
       preferredCurrency: "USD",
     },
+    {
+      name: "Li Wei (Mitra Agen Shanghai)",
+      email: "agent@example.com",
+      password: "agent123",
+      role: "agent",
+      phone: "+8613800138000",
+      country: "China",
+      preferredLanguage: "zh",
+      preferredCurrency: "CNY",
+    },
   ];
 
   for (const u of users) {
@@ -366,7 +380,49 @@ async function main() {
       },
     });
   }
-  console.log("✅ Demo users for all 5 roles seeded.");
+  console.log("✅ Demo users for all roles seeded.");
+
+  // Commission Rules & Agent Seeding
+  const defaultRule = await prisma.commissionRule.upsert({
+    where: { id: "rule-agent-100" },
+    update: { payoutShare: 1.0 },
+    create: {
+      id: "rule-agent-100",
+      name: "Standard Agent (100% Cadangan Komisi)",
+      payoutShare: 1.0,
+      isDefault: true,
+    },
+  });
+
+  await prisma.commissionRule.upsert({
+    where: { id: "rule-affiliate-50" },
+    update: { payoutShare: 0.5 },
+    create: {
+      id: "rule-affiliate-50",
+      name: "Standard Affiliate (50% Cadangan Komisi)",
+      payoutShare: 0.5,
+      isDefault: false,
+    },
+  });
+
+  const agentUser = await prisma.user.findUnique({ where: { email: "agent@example.com" } });
+  if (agentUser) {
+    await prisma.agent.upsert({
+      where: { userId: agentUser.id },
+      update: { status: "active", tier: "agent" },
+      create: {
+        userId: agentUser.id,
+        refCode: "SHANGHAI-WEI",
+        tier: "agent",
+        status: "active",
+        country: "China",
+        companyName: "Shanghai Silk Road Travel",
+        commissionRuleId: defaultRule.id,
+        payoutMethod: "wise",
+      },
+    });
+  }
+  console.log("✅ Commission rules and demo Agent seeded.");
 
   console.log("🎉 Seeding completed successfully!");
 }

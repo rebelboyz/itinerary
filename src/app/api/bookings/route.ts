@@ -6,8 +6,9 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const bookingId = searchParams.get("id");
+    const session = await getSession();
 
-    // Public lookup by ID for checkout and success vouchers
+    // Lookup by ID for checkout page & voucher (sanitized public output)
     if (bookingId) {
       const booking = await prisma.booking.findUnique({
         where: { id: bookingId },
@@ -29,16 +30,59 @@ export async function GET(req: NextRequest) {
               },
             },
           },
-          user: true,
-          assignedGuide: true,
-          payments: true,
-          expenses: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true,
+            },
+          },
+          assignedGuide: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+            },
+          },
+          payments: {
+            select: {
+              id: true,
+              amount: true,
+              currency: true,
+              status: true,
+              paymentType: true,
+              paidAt: true,
+            },
+          },
+          // Only include internal expenses if admin or finance or assigned guide
+          expenses: !!(
+            session && (session.role === "admin" || session.role === "finance" || session.role === "guide")
+          ),
+          costLines: !!(session && (session.role === "admin" || session.role === "finance")),
+          commission: !!(session && (session.role === "admin" || session.role === "finance")),
         },
       });
-      return NextResponse.json({ bookings: booking ? [booking] : [] });
+
+      if (!booking) return NextResponse.json({ bookings: [] });
+
+      // If user is guest/public customer, strip private pricing internals
+      const isPrivileged = !!(session && (session.role === "admin" || session.role === "finance"));
+      const sanitizedBooking: any = {
+        ...booking,
+      };
+      if (booking.trip) {
+        sanitizedBooking.trip = {
+          ...booking.trip,
+          marginTargetAmount: isPrivileged ? (booking.trip as any).marginTargetAmount : undefined,
+          commissionReserveAmount: isPrivileged ? (booking.trip as any).commissionReserveAmount : undefined,
+          gatewayFeeAmount: isPrivileged ? (booking.trip as any).gatewayFeeAmount : undefined,
+        };
+      }
+
+      return NextResponse.json({ bookings: [sanitizedBooking] });
     }
 
-    const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -48,6 +92,9 @@ export async function GET(req: NextRequest) {
       where.userId = session.id;
     } else if (session.role === "guide") {
       where.assignedGuideId = session.id;
+    } else if (session.role === "agent") {
+      const agent = await prisma.agent.findUnique({ where: { userId: session.id } });
+      where.agentId = agent ? agent.id : "no-match";
     }
 
     const bookings = await prisma.booking.findMany({
@@ -69,10 +116,25 @@ export async function GET(req: NextRequest) {
             },
           },
         },
-        user: true,
-        assignedGuide: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+        assignedGuide: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
         payments: true,
-        expenses: true,
+        expenses: session.role === "admin" || session.role === "finance" || session.role === "guide",
+        costLines: session.role === "admin" || session.role === "finance",
+        commission: session.role === "admin" || session.role === "finance" || session.role === "agent",
       },
       orderBy: { createdAt: "desc" },
     });
@@ -91,7 +153,7 @@ export async function POST(req: NextRequest) {
 
     const trip = await prisma.trip.findUnique({
       where: { id: tripId },
-      include: { vehicleType: true },
+      include: { vehicleType: true, lead: true },
     });
 
     if (!trip) {
@@ -104,6 +166,7 @@ export async function POST(req: NextRequest) {
       data: {
         tripId: trip.id,
         userId: trip.userId,
+        agentId: trip.agentId || null,
         totalAmount: trip.totalAmount,
         currency: "IDR",
         status: "pending",
@@ -115,10 +178,29 @@ export async function POST(req: NextRequest) {
       include: { trip: true },
     });
 
+    // If trip is tied to a lead, advance status to "booked" and log activity
+    if (trip.leadId) {
+      await prisma.lead.update({
+        where: { id: trip.leadId },
+        data: {
+          status: "booked",
+          lastAgentActivityAt: new Date(),
+        },
+      });
+
+      await prisma.leadActivity.create({
+        data: {
+          leadId: trip.leadId,
+          type: "status_change",
+          body: `Booking dibuat (${booking.midtransOrderId}). Status lead berubah menjadi 'booked'.`,
+          meta: { bookingId: booking.id, midtransOrderId: booking.midtransOrderId },
+        },
+      });
+    }
+
     return NextResponse.json({ success: true, booking });
   } catch (error) {
     console.error("Create booking error:", error);
     return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
   }
 }
-

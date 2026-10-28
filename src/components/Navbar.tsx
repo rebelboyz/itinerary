@@ -121,6 +121,14 @@ export function Navbar() {
                 {t.nav.finance}
               </Link>
             )}
+            {(currentUser?.role === "agent" || currentUser?.role === "admin") && (
+              <Link
+                href="/agent"
+                className="text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full text-xs font-bold border border-indigo-200"
+              >
+                {t.nav.agent}
+              </Link>
+            )}
           </nav>
 
           {/* Right section: Language selector, Currency, & Auth */}
@@ -273,6 +281,8 @@ export function Navbar() {
                       ? "/guide"
                       : currentUser.role === "finance"
                       ? "/finance"
+                      : currentUser.role === "agent"
+                      ? "/agent"
                       : "/itineraries"
                   }
                   className="inline-flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition min-h-[34px] sm:min-h-[38px] touch-manipulation shrink-0"

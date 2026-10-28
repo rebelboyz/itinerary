@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState, useMemo, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Compass,
   Calendar,
@@ -93,9 +93,38 @@ interface DayPlan {
   mealIds: string[];
 }
 
-export default function ItineraryBuilderPage() {
+function ItineraryBuilderContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const leadIdParam = searchParams.get("lead") || searchParams.get("leadId");
+  const [leadCustomer, setLeadCustomer] = useState<{ id: string; name: string; email: string; phone?: string } | null>(null);
   const { t, locale, formatPrice, currency } = useI18n();
+
+  useEffect(() => {
+    if (!leadIdParam) return;
+    async function fetchLead() {
+      try {
+        const res = await fetch(`/api/leads/${leadIdParam}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.lead) {
+            setLeadCustomer({
+              id: data.lead.id,
+              name: data.lead.name,
+              email: data.lead.email,
+              phone: data.lead.phone,
+            });
+            if (data.lead.name) {
+              setTitle(`Trip Proposal - ${data.lead.name}`);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load lead details", err);
+      }
+    }
+    fetchLead();
+  }, [leadIdParam]);
 
   // Master data
   const [destinations, setDestinations] = useState<Destination[]>([]);
@@ -390,6 +419,10 @@ export default function ItineraryBuilderPage() {
           withGuide: includeGuide,
           pickupPoint,
           dropoffPoint,
+          leadId: leadIdParam || null,
+          customerName: leadCustomer?.name,
+          customerEmail: leadCustomer?.email,
+          customerPhone: leadCustomer?.phone,
           pricing,
           days: days.map((d) => ({
             dayNumber: d.dayNumber,
@@ -459,6 +492,10 @@ export default function ItineraryBuilderPage() {
           withGuide: includeGuide,
           pickupPoint,
           dropoffPoint,
+          leadId: leadIdParam || null,
+          customerName: leadCustomer?.name,
+          customerEmail: leadCustomer?.email,
+          customerPhone: leadCustomer?.phone,
           pricing,
           days: days.map((d) => ({
             dayNumber: d.dayNumber,
@@ -544,6 +581,23 @@ export default function ItineraryBuilderPage() {
           {t.builder.subtitle}
         </p>
       </div>
+
+      {leadCustomer && (
+        <div className="mb-6 p-3.5 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between gap-3 text-xs sm:text-sm text-blue-900">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+            <span>
+              <strong>
+                {locale === "zh" ? "方案客户：" : locale === "en" ? "Proposal for Lead:" : "Penawaran untuk Lead:"}
+              </strong>{" "}
+              {leadCustomer.name} ({leadCustomer.email})
+            </span>
+          </div>
+          <span className="px-2 py-0.5 bg-blue-600 text-white font-bold rounded text-[11px]">
+            {locale === "zh" ? "代理/客服报价模式" : locale === "en" ? "Agent/CS Proposal Mode" : "Mode Penawaran Agen/CS"}
+          </span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Builder Column (8 cols) */}
@@ -1277,8 +1331,8 @@ export default function ItineraryBuilderPage() {
                 </div>
 
                 <div className="flex justify-between text-emerald-700 text-xs sm:text-sm font-medium">
-                  <span>{t.builder.marginLabel} ({pricing.marginPercent * 100}%):</span>
-                  <span>+{formatPrice(pricing.marginAmount)}</span>
+                  <span>{t.builder.platformFeeLabel || t.builder.marginLabel}:</span>
+                  <span>+{formatPrice(pricing.platformFeeAmount || pricing.marginAmount)}</span>
                 </div>
 
                 {/* Total Highlight */}
@@ -1502,6 +1556,23 @@ export default function ItineraryBuilderPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ItineraryBuilderPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+          <div className="text-center space-y-2">
+            <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs text-slate-400">Loading Itinerary ID Builder...</p>
+          </div>
+        </div>
+      }
+    >
+      <ItineraryBuilderContent />
+    </Suspense>
   );
 }
 
